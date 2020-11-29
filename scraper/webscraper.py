@@ -5,20 +5,22 @@ import glob
 import pandas as pd
 import time
 
-# Geckdriver path
+# Geckodriver path
 PATH = 'C:\\Program Files\\BrowserDrivers\\geckodriver-v0.28.0-win64\\geckodriver.exe'
 
 # Url to scrape
 URL = "http://nzxj65x32vh2fkhk.onion/"
 
 # Keywords to search
-KEYWORDS = ["money", "bitcoin", "passwords", "hacked", "password", "wallet",
+KEYWORDS = ["all", "money", "bitcoin", "passwords", "hacked", "password", "wallet",
             "hacked", "stolen", "username", "account", "dollar", "money", "forbidden"]
 
 
+# Gett current time in ms
 def current_milli_time(): return str(round(time.time() * 1000))
 
 
+# Sets a profile with Proxy
 def set_profile():
     # Setting profile to use proxy
     profile = webdriver.FirefoxProfile()
@@ -30,15 +32,17 @@ def set_profile():
     return profile
 
 
+# Combines all of the currently scraped data, wil change later to combine with main CSV file \ save on a DB
 def forum_scrape():
+    print("\nCombining all CSV files to one...")
     all_csv = glob.glob("data\\seperated\\*.csv")
     frames = []
 
     for path in all_csv:
         frames.append(pd.read_csv(path))
 
-    result = pd.concat(frames, ignore_index = True)
-    result = result.drop_duplicates(subset="content")
+    result = pd.concat(frames, ignore_index=True)
+    result = result.drop_duplicates(subset=["content", "headers", "date"])
     result.to_csv('data/ForumScrape.csv')
 
 
@@ -55,7 +59,8 @@ def main():
     for search in KEYWORDS:
         # Scrapping
         print(f"\nSearching: {search}..")
-        driver.get(f'{URL}search?q={search}')
+        driver.get(
+            f'{URL}{search if search == "all" else f"search?q={search}"}')
 
         headers = driver.find_elements_by_tag_name('h4')
         content = driver.find_elements_by_class_name('text')
@@ -71,22 +76,21 @@ def main():
 
             data['headers'].append(headers[index].text.strip())
             data['content'].append(content[index].text.strip())
-            data['author'].append(author_date[0].strip())
-            data['date'].append(author_date[1].strip())
+            data['author'].append(author_date[0].strip().replace("Posted by ", ""))
+            data['date'].append(
+                author_date[1].strip())
 
-    print('Closing broswer')
+    print('\nClosing broswer')
     driver.close()
     driver.quit()
 
     date = current_milli_time()
-    print(f"Creating new csv file: scrape-{date}")
+    print(f"\nCreating new csv file: scrape-{date}")
     df = pd.DataFrame(
         data, columns=['headers', 'content', 'author', 'date', ...])
     df.to_csv(f'data/seperated/scrape-{date}.csv')
 
-    print("Combining all CSV files to one...")
     forum_scrape()
-
 
 
 if __name__ == "__main__":
