@@ -4,3 +4,4 @@ scraper/data
 scraper/geckodriver.log
 venv
 node_modules
+server/.env

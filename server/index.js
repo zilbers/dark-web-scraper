@@ -6,6 +6,7 @@ module.exports = app;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use('/api/', require('./api'));
 
 app.get('/ping', (req, res) => {
   try {
@@ -16,6 +17,8 @@ app.get('/ping', (req, res) => {
 });
 
 app.listen(
-  8080,
-  console.log(`Dark-Web-Scraper is running at http://localhost:8080`)
+  process.env.PORT,
+  console.log(
+    `Dark-Web-Scraper is running at http://localhost:${process.env.PORT}`
+  )
 );
