@@ -12,8 +12,8 @@ PATH = 'C:\\Program Files\\BrowserDrivers\\geckodriver-v0.28.0-win64\\geckodrive
 URL = "http://nzxj65x32vh2fkhk.onion/"
 
 # Keywords to search
-KEYWORDS = ["all", "money", "bitcoin", "passwords", "hacked", "password", "wallet",
-            "hacked", "stolen", "username", "account", "dollar", "money", "forbidden"]
+KEYWORDS = ["all", "DDOS", "exploits", "attack", "money", "bitcoin", "passwords", "information", "market", "explosives", "weapons", "hacked", "password", "wallet", "Ransomware", "hacked", "stolen", "admin", "blockchain", "cryptocurrency",
+            "username", "account", "dollar", "biometric", "money", "forbidden", "leaked", "fullz", "Взломщик", "Залив", "Безнал", "Взлом", "dump data", "security", "payment"]
 
 
 # Gett current time in ms
@@ -76,7 +76,8 @@ def main():
 
             data['headers'].append(headers[index].text.strip())
             data['content'].append(content[index].text.strip())
-            data['author'].append(author_date[0].strip().replace("Posted by ", ""))
+            data['author'].append(
+                author_date[0].strip().replace("Posted by ", ""))
             data['date'].append(
                 author_date[1].strip())
 
