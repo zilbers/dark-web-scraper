@@ -1,6 +1,4 @@
 import json
-import os
-import sys
 import logging
 
 from pprint import pprint
@@ -58,11 +56,11 @@ def create_index(es_object, index_name, settings):
         return created
 
 
-def store_record(es_object, index_name, record):
+def store_record(elastic_object, index_name, doc_type, record):
     is_stored = True
     try:
-        outcome = es_object.index(
-            index=index_name, doc_type='data', body=record)
+        outcome = elastic_object.index(
+            index=index_name, doc_type=doc_type, body=record)
         print(outcome)
     except Exception as ex:
         print('Error in indexing data')
@@ -70,14 +68,6 @@ def store_record(es_object, index_name, record):
         is_stored = False
     finally:
         return is_stored
-
-
-def load_json(directory):
-    # " Use a generator, no need to load all in memory"
-    for filename in os.listdir(directory):
-        if filename.endswith('.json'):
-            with open(f'{directory}/{filename}', encoding="utf8",  errors='ignore') as open_file:
-                yield json.load(open_file)
 
 
 def connect_elasticsearch():
@@ -93,11 +83,3 @@ def connect_elasticsearch():
 if __name__ == '__main__':
     es = connect_elasticsearch()
     create_index(es, "data", settings)
-
-    data = []
-
-    jsonFilePath = r'data/ForumScrape.json'
-    print("Adding JSON file data to Elasticsearch")
-    helpers.bulk(es, load_json("data"))
-
-    # store_record(es, "data", data)
