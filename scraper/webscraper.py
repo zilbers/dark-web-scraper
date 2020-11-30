@@ -1,9 +1,9 @@
-from selenium import webdriver
-from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-import glob
 import pandas as pd
 import time
+from get_urls import get_urls
+from forum_scrape import forum_scrape
+from set_driver import set_driver
+from make_json import make_json
 
 # Geckodriver path
 PATH = 'C:\\Program Files\\BrowserDrivers\\geckodriver-v0.28.0-win64\\geckodriver.exe'
@@ -12,47 +12,17 @@ PATH = 'C:\\Program Files\\BrowserDrivers\\geckodriver-v0.28.0-win64\\geckodrive
 URL = "http://nzxj65x32vh2fkhk.onion/"
 
 # Keywords to search
-KEYWORDS = ["all", "DDOS", "exploits", "attack", "money", "bitcoin", "passwords", "information", "market", "explosives", "weapons", "hacked", "password", "wallet", "Ransomware", "hacked", "stolen", "admin", "blockchain", "cryptocurrency",
+KEYWORDS = ["all", "DDOS", "exploits", "attack", "money", "bitcoin", "passwords", "information", "market", "explosives", "weapons", "hacked", "password", "wallet", "ransomware", "hacked", "stolen", "admin", "blockchain", "cryptocurrency",
             "username", "account", "dollar", "biometric", "money", "forbidden", "leaked", "fullz", "Взломщик", "Залив", "Безнал", "Взлом", "dump data", "security", "payment"]
 
 
-# Gett current time in ms
+# Get current time in ms
 def current_milli_time(): return str(round(time.time() * 1000))
 
 
-# Sets a profile with Proxy
-def set_profile():
-    # Setting profile to use proxy
-    profile = webdriver.FirefoxProfile()
-    profile.set_preference('network.proxy.type', 1)
-    profile.set_preference('network.proxy.socks', '127.0.0.1')
-    profile.set_preference('network.proxy.socks_port', 9050)
-    profile.set_preference('network.proxy.http', '127.0.0.1')
-    profile.set_preference('network.proxy.http_port', 8118)
-    return profile
-
-
-# Combines all of the currently scraped data, wil change later to combine with main CSV file \ save on a DB
-def forum_scrape():
-    print("\nCombining all CSV files to one...")
-    all_csv = glob.glob("data\\seperated\\*.csv")
-    frames = []
-
-    for path in all_csv:
-        frames.append(pd.read_csv(path))
-
-    result = pd.concat(frames, ignore_index=True)
-    result = result.drop_duplicates(subset=["content", "headers", "date"])
-    result.to_csv('data/ForumScrape.csv')
-
-
 def main():
-    print("\nSetting up your anonymous profile to browse the dark web!")
-    profile = set_profile()
-
-    # Setting the driver
-    print("Setting up webdriver with Proxy..")
-    driver = webdriver.Firefox(executable_path=PATH, firefox_profile=profile)
+    print("\nSetting up your anonymous profile and driver to browse the dark web!")
+    driver = set_driver(PATH)
 
     data = {"headers": [], "content": [], "author": [], "date": []}
 
@@ -85,13 +55,22 @@ def main():
     driver.close()
     driver.quit()
 
+    # Saves the currently scraped data to new file signed by date
     date = current_milli_time()
     print(f"\nCreating new csv file: scrape-{date}")
     df = pd.DataFrame(
         data, columns=['headers', 'content', 'author', 'date', ...])
     df.to_csv(f'data/seperated/scrape-{date}.csv')
 
-    forum_scrape()
+    # Creates main file with no duplicates
+    forum_scrape("data/seperated/*.csv", 'data/ForumScrape.csv',
+                 ["content", "headers", "date"])
+
+    # Save urls in seperate file
+    urls = get_urls("data\ForumScrape.csv")
+    df = pd.DataFrame(
+        urls, columns=['url', ...])
+    df.to_csv('data/Links.csv')
 
 
 if __name__ == "__main__":

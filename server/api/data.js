@@ -25,6 +25,26 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get links
+router.get('/links', async (req, res) => {
+  try {
+    const results = [];
+
+    await new Promise((resolve, reject) => {
+      fs.createReadStream('../scraper/data/Links.csv')
+        .pipe(csv())
+        .on('data', (data) => results.push(data))
+        .on('end', () => {
+          resolve();
+        });
+    });
+
+    res.json(results);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
 // router.get('/check', async (req, res) => {
 //   try {
 //     let dataToSend;

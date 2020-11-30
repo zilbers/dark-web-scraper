@@ -1,29 +1,21 @@
 version: '2.2'
 
 services:
-  # app:
-  #   build:
-  #     context: '.'
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - '80:80'
-  #     - '8000:8000'
-  #   volumes:
-  #     - type: bind
-  #       source: .
-  #       target: /app
-  #   command: sh -c '/app/app/wait_for_it.sh mysql:3306 && /start-reload.sh'
-  #   environment:
-  #     - MYSQL_ROOT_PASSWORD=test
-  #     - MYSQL_USER=test
-  #     - MYSQL_PASSWORD=test
-  #     - MYSQL_DATABASE=test
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
+    container_name: elasticsearch
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      ES_JAVA_OPTS: '-Xms256m -Xmx256m'
+      network.bind_host: 0.0.0.0
+      network.host: 0.0.0.0
+      discovery.type: single-node
 
-  #   networks:
-  #     frontapp_a:
-  #       ipv4_address: 172.22.0.11
-  #   depends_on:
-  #     - mysql
+    networks:
+      app-network:
+        ipv4_address: 172.22.0.10
 
   server:
     build:
@@ -39,10 +31,10 @@ services:
       - NODE_ENV=development
 
     networks:
-      frontapp_a:
+      app-network:
         ipv4_address: 172.22.0.12
-    # depends_on:
-    #   - mysql
+    depends_on:
+      - elasticsearch
 
   proxy:
     image: dperson/torproxy
@@ -51,25 +43,11 @@ services:
       - '9050:9050'
       - '8118:8118'
     networks:
-      frontapp_a:
+      app-network:
         ipv4_address: 172.22.0.13
 
-  # mysql:
-  #   image: mysql:8
-  #   container_name: mysql
-  #   hostname: mysql
-  #   environment:
-  #     - MYSQL_ROOT_PASSWORD=test
-  #     - MYSQL_USER=test
-  #     - MYSQL_PASSWORD=test
-  #     - MYSQL_DATABASE=test
-
-  #   networks:
-  #     frontapp_a:
-  #       ipv4_address: 172.22.0.10
-
 networks:
-  frontapp_a:
+  app-network:
     driver: bridge
     ipam:
       driver: default

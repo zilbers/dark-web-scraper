@@ -10,6 +10,6 @@ RUN npm i --silent
 
 EXPOSE 8080
 
-COPY . /src
+COPY . /src/app
 
 CMD ["npm", "run", "dev"]
