@@ -38,13 +38,34 @@ services:
 
   proxy:
     image: dperson/torproxy
-    container_name: proxy
+    container_name: tor
+    hostname: tor
     ports:
       - '9050:9050'
       - '8118:8118'
     networks:
       app-network:
         ipv4_address: 172.22.0.13
+
+  webscraper:
+    build:
+      context: '.'
+      dockerfile: Dockerfile
+    container_name: 'webscraper'
+    ports:
+      - '80:80'
+      - '8000:8000'
+    volumes:
+      - type: bind
+        source: .
+        target: /scraper
+    command: sh -c '/app/app/wait_for_it.sh elasticsearch:9200 && /app/app/wait_for_it.sh tor:9050 && python /app/webscraper.py'
+
+    networks:
+      app-network:
+        ipv4_address: 172.22.0.14
+    depends_on:
+      - elasticsearch
 
 networks:
   app-network:

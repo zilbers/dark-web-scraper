@@ -26,5 +26,5 @@ def make_json(csvFilePath, jsonFilePath):
 csvFilePath = r'data/ForumScrape.csv'
 jsonFilePath = r'data/ForumScrape.json'
 
-print("Making a new JSON file")
-make_json(csvFilePath, jsonFilePath)
+# print("Making a new JSON file")
+# make_json(csvFilePath, jsonFilePath)
