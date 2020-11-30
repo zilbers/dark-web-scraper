@@ -1,9 +1,9 @@
 import pandas as pd
 import time
-from get_urls import get_urls
-from forum_scrape import forum_scrape
-from set_driver import set_driver
-from make_json import make_json
+from helpers.get_urls import get_urls
+from helpers.forum_scrape import forum_scrape
+from helpers.set_driver import set_driver
+from helpers.make_json import make_json
 
 # Geckodriver path
 PATH = 'C:\\Program Files\\BrowserDrivers\\geckodriver-v0.28.0-win64\\geckodriver.exe'
