@@ -1,0 +1,77 @@
+version: '2.2'
+
+services:
+  # app:
+  #   build:
+  #     context: '.'
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - '80:80'
+  #     - '8000:8000'
+  #   volumes:
+  #     - type: bind
+  #       source: .
+  #       target: /app
+  #   command: sh -c '/app/app/wait_for_it.sh mysql:3306 && /start-reload.sh'
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=test
+  #     - MYSQL_USER=test
+  #     - MYSQL_PASSWORD=test
+  #     - MYSQL_DATABASE=test
+
+  #   networks:
+  #     frontapp_a:
+  #       ipv4_address: 172.22.0.11
+  #   depends_on:
+  #     - mysql
+
+  server:
+    build:
+      context: './server'
+      dockerfile: Dockerfile
+    container_name: node-server
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./server:/src/app
+    environment:
+      - PORT=8080
+      - NODE_ENV=development
+
+    networks:
+      frontapp_a:
+        ipv4_address: 172.22.0.12
+    # depends_on:
+    #   - mysql
+
+  proxy:
+    image: dperson/torproxy
+    container_name: proxy
+    ports:
+      - '9050:9050'
+      - '8118:8118'
+    networks:
+      frontapp_a:
+        ipv4_address: 172.22.0.13
+
+  # mysql:
+  #   image: mysql:8
+  #   container_name: mysql
+  #   hostname: mysql
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=test
+  #     - MYSQL_USER=test
+  #     - MYSQL_PASSWORD=test
+  #     - MYSQL_DATABASE=test
+
+  #   networks:
+  #     frontapp_a:
+  #       ipv4_address: 172.22.0.10
+
+networks:
+  frontapp_a:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.22.0.0/16
