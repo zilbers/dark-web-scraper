@@ -4,6 +4,8 @@ from helpers.get_urls import get_urls
 from helpers.forum_scrape import forum_scrape
 from helpers.scraper import scraper_request
 from helpers.make_json import make_json
+import requests
+import os
 
 # Url to scrape
 URL = "http://nzxj65x32vh2fkhk.onion/"
@@ -21,27 +23,30 @@ def main():
     while True:
         print("\nSetting up your Proxy to browse the dark web!")
         data = scraper_request(URL, KEYWORDS)
-        
+        path = os.environ.get('DATA_PATH')
+
         # Saves the currently scraped data to new file signed by date
         date = current_milli_time()
         print(f"\nCreating new csv file: scrape-{date}")
         df = pd.DataFrame(
             data, columns=['headers', 'content', 'author', 'date', ...])
-        df.to_csv(f'data/seperated/scrape-{date}.csv')
+
+        path = {path if path != None else 'data'}
+        df.to_csv(path + '/seperated/scrape-{date}.csv')
 
         # Creates main file with no duplicates
-        forum_scrape("data/seperated/*.csv", 'data/ForumScrape.csv',
+        forum_scrape(path + '/seperated/*.csv', path + '/ForumScrape.csv',
                      ["content", "headers", "date"])
 
         # Save urls in seperate file
-        urls = get_urls("data\ForumScrape.csv")
+        urls = get_urls(f"{path}/ForumScrape.csv")
         df = pd.DataFrame(
             urls, columns=['url', ...])
-        df.to_csv('data/Links.csv')
+        df.to_csv(path + '/Links.csv')
 
         print("Making a new JSON file")
-        csvFilePath = r'data/ForumScrape.csv'
-        jsonFilePath = r'data/ForumScrape.json'
+        csvFilePath = path + '/ForumScrape.csv'
+        jsonFilePath = path + '/ForumScrape.json'
         make_json(csvFilePath, jsonFilePath)
 
         wait = 10

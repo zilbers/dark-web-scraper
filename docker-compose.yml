@@ -52,6 +52,9 @@ services:
       context: '.'
       dockerfile: Dockerfile
     container_name: 'webscraper'
+    environment:
+      - PROXY=tor
+      - DATA_PATH=app/data
     ports:
       - '80:80'
       - '8000:8000'
