@@ -50,7 +50,10 @@ def current_milli_time(): return str(round(time.time() * 1000))
 
 
 def main():
-    es = connect_elasticsearch('elasticsearch')
+    host = os.environ.get('HOST')
+    es = connect_elasticsearch(host if host != None else 'localhost')
+    create_index(es, 'data', settings)
+    
     while True:
         print("\nSetting up your Proxy to browse the dark web!")
         data = scraper_request(URL, KEYWORDS)
@@ -79,7 +82,6 @@ def main():
         # csvFilePath = path + '/ForumScrape.csv'
         # jsonFilePath = path + '/ForumScrape.json'
         # make_json(csvFilePath, jsonFilePath)
-        create_index(es, 'data', settings)
         for record in data:
             store_record(es, "data", "data", record)
 

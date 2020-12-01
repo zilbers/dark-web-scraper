@@ -31,6 +31,7 @@ services:
     environment:
       - PORT=8080
       - NODE_ENV=development
+      - HOST=elasticsearch
 
     networks:
       app-network:
@@ -56,7 +57,7 @@ services:
     container_name: 'webscraper'
     environment:
       - PROXY=tor
-      - DATA_PATH=app/data
+      - HOST=elasticsearch
     ports:
       - '80:80'
       - '8000:8000'
