@@ -36,17 +36,14 @@ function App() {
             setInputText={setInputText}
           />
           {Array.isArray(searchResults.result) &&
-            searchResults.result.map((item, index) => {
-              console.log(item);
-              return (
-                <div key={index}>
-                  <h4>{item.header}</h4>
-                  <div>{item.content}</div>
-                  <span>{item.author}</span>
-                  <span>{item.date}</span>
-                </div>
-              );
-            })}
+            searchResults.result.map((item, index) => (
+              <div key={index}>
+                <h4>{item.header}</h4>
+                <div>{item.content}</div>
+                <span>{item.author}</span>
+                <span>{item.date}</span>
+              </div>
+            ))}
         </>
       )}
     </div>
