@@ -61,7 +61,6 @@ const router = Router();
 // Get data
 router.get('/', async (req, res) => {
   try {
-    await indices(client, 'data', dataProps);
     const { body: result } = await client.search(
       {
         index: 'data',
@@ -78,7 +77,31 @@ router.get('/', async (req, res) => {
       }
     );
 
-    res.json(result.hits);
+    const sourceArr = result.hits.hits.map((item) => item._source);
+    res.json(sourceArr);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
+// Search in data
+router.get('/_search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    const { body: result } = await client.search(
+      {
+        index: 'data',
+        q,
+        size: 1000,
+      },
+      {
+        ignore: [404],
+        maxRetries: 3,
+      }
+    );
+
+    const sourceArr = result.hits.hits.map((item) => item._source);
+    res.json(sourceArr);
   } catch ({ message }) {
     res.status(500).send(message);
   }
