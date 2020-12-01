@@ -69,24 +69,10 @@ def store_record(elastic_object, index_name, doc_type, record):
         return is_stored
 
 
-<< << << < HEAD
-
-
 def connect_elasticsearch(host='localhost'):
     _es = None
     _es = Elasticsearch([{'host': host, 'port': 9200}])
-
-
-== == == =
-
-
-def connect_elasticsearch():
-    _es = None
-    _es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
-
-
->>>>>> > parent of d92a5b4... Revert "Dockerizing scraper"
-   if _es.ping():
+    if _es.ping():
         print('Yay Connected!')
     else:
         print('Awww it could not connect!')

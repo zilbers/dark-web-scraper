@@ -31,7 +31,7 @@ services:
     environment:
       - PORT=8080
       - NODE_ENV=development
-      - HOST=elasticsearch
+      - HOST=http://elasticsearch:9200
 
     networks:
       app-network:
@@ -58,6 +58,7 @@ services:
     environment:
       - PROXY=tor
       - HOST=elasticsearch
+      - NODE_SERVER=http://node-server:8080
     ports:
       - '80:80'
       - '8000:8000'

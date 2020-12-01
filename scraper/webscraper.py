@@ -50,9 +50,10 @@ def current_milli_time(): return str(round(time.time() * 1000))
 
 
 def main():
-    host = os.environ.get('HOST')
-    es = connect_elasticsearch(host if host != None else 'localhost')
-    create_index(es, 'data', settings)
+    # host = os.environ.get('HOST')
+    url = os.environ.get('NODE_SERVER')
+    # es = connect_elasticsearch(host if host != None else 'localhost')
+    # create_index(es, 'data', settings)
     
     while True:
         print("\nSetting up your Proxy to browse the dark web!")
@@ -82,8 +83,8 @@ def main():
         # csvFilePath = path + '/ForumScrape.csv'
         # jsonFilePath = path + '/ForumScrape.json'
         # make_json(csvFilePath, jsonFilePath)
-        for record in data:
-            store_record(es, "data", "data", record)
+        res = requests.post(url + '/api/data' if url != None else 'http://localhost:8080/api/data', json = data)
+        print(f'Data sent to server and, {res}')
 
         wait = 10
         print(f"Waiting {wait} minutes before next interval")

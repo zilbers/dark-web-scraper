@@ -3,8 +3,38 @@ const csv = require('csv-parser');
 const { Client } = require('@elastic/elasticsearch');
 const fs = require('fs');
 
+// Helpers
+async function indices(client, index, properties) {
+  client.indices.exists(
+    {
+      index,
+    },
+    (err, res, status) => {
+      if (res.body) {
+        console.log('Index exists');
+      } else {
+        client.indices.create(
+          {
+            index,
+            body: {
+              mappings: {
+                properties: {
+                  ...properties,
+                },
+              },
+            },
+          },
+          (err, res, status) => {
+            console.log(err, res, status);
+          }
+        );
+      }
+    }
+  );
+}
+
 const client = new Client({
-  node: `http://${process.env.HOST}:9200` || 'http://localhost:9200',
+  node: process.env.HOST || 'http://localhost:9200',
   maxRetries: 5,
   requestTimeout: 60000,
   sniffOnStart: true,
@@ -27,9 +57,11 @@ const dataProps = {
 
 const router = Router();
 
+// ENTRYPOINTS
 // Get data
 router.get('/', async (req, res) => {
   try {
+    await indices(client, 'data', dataProps);
     const { body: result } = await client.search(
       {
         index: 'data',
@@ -47,6 +79,27 @@ router.get('/', async (req, res) => {
     );
 
     res.json(result.hits);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
+// Post new data
+router.post('/', async (req, res) => {
+  try {
+    const index = 'data';
+
+    await indices(client, 'data', dataProps);
+
+    const { body: data } = req;
+    const body = data.flatMap((doc) => {
+      const _id = doc._id;
+      delete doc._id;
+      return [{ index: { _index: index, _type: 'data', _id } }, doc];
+    });
+
+    const bulkResponse = await client.bulk({ refresh: true, body });
+    res.json(bulkResponse);
   } catch ({ message }) {
     res.status(500).send(message);
   }

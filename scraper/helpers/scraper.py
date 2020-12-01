@@ -69,7 +69,8 @@ def scraper_request(url, keywords=[]):
         print("\tAdding data to object..")
         for index in range(len(headers)):
             author_date = author[index * 2].text.split("at")
-            data_dict = {"header": headers[index].text.strip(), "content": content[index].text.strip(
-            ), "author": author_date[0].strip().replace("Posted by ", ""), "date": author_date[1].strip()}
+            data_dict = {
+                '_id': hash(headers[index].text.strip() + author_date[1].strip()), "header": headers[index].text.strip(), "content": content[index].text.strip(
+                ), "author": author_date[0].strip().replace("Posted by ", ""), "date": author_date[1].strip()}
             data.append(data_dict)
     return data
