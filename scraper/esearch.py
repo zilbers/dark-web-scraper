@@ -16,7 +16,6 @@ settings = {
         "data": {
             "dynamic": "strict",
             "properties": {
-
                 "header": {
                     "type": "text"
                 },

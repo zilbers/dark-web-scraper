@@ -16,6 +16,7 @@ def make_json(csvFilePath, jsonFilePath):
             del item["item_id"]
             del item["delete"]
             del item["id"]
+            # item["_id"] = hash(item["header"] + item["date"])
 
         out = json.dumps(data, ensure_ascii=False)
 
@@ -23,8 +24,8 @@ def make_json(csvFilePath, jsonFilePath):
         jsonf.write(out)
 
 
-csvFilePath = r'data/ForumScrape.csv'
-jsonFilePath = r'data/ForumScrape.json'
+# csvFilePath = r'../data/ForumScrape.csv'
+# jsonFilePath = r'../data/ForumScrape.json'
 
 # print("Making a new JSON file")
 # make_json(csvFilePath, jsonFilePath)
