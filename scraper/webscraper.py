@@ -16,6 +16,8 @@ URL = "http://nzxj65x32vh2fkhk.onion/"
 KEYWORDS = ["all", "DDOS", "exploits", "attack", "money", "bitcoin", "passwords", "information", "market", "explosives", "weapons", "hacked", "password", "wallet", "ransomware", "hacked", "stolen", "admin", "blockchain", "cryptocurrency",
             "username", "account", "dollar", "biometric", "money", "forbidden", "leaked", "fullz", "Взломщик", "Залив", "Безнал", "Взлом", "dump data", "security", "payment"]
 
+# KEYWORDS = ["all"]
+
 # Settings for elasticsearch index
 settings = {
     "settings": {
@@ -86,7 +88,7 @@ def main():
         res = requests.post(url + '/api/data' if url != None else 'http://localhost:8080/api/data', json = data)
         print(f'Data sent to server and, {res}')
 
-        wait = 10
+        wait = 2
         print(f"Waiting {wait} minutes before next interval")
         time.sleep(wait * 60)
 

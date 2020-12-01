@@ -11,7 +11,7 @@ async function indices(client, index, properties) {
     },
     (err, res, status) => {
       if (res.body) {
-        console.log('Index exists');
+        console.log('Index exists!');
       } else {
         client.indices.create(
           {
@@ -93,7 +93,7 @@ router.post('/', async (req, res) => {
 
     const { body: data } = req;
     const body = data.flatMap((doc) => {
-      const _id = doc._id;
+      const _id = doc._id.slice();
       delete doc._id;
       return [{ index: { _index: index, _type: 'data', _id } }, doc];
     });
