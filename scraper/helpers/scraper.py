@@ -41,7 +41,7 @@ def scraper_selenium(url, keywords=[]):
 # Scrapes the data and returns a JSON with the content, using requests
 def scraper_request(url, keywords=[]):
     print(f"Scraping {url}")
-    
+
     host = os.environ.get('PROXY')
 
     proxyDict = {
@@ -49,7 +49,7 @@ def scraper_request(url, keywords=[]):
         "https": f"socks5h://{host if host != None else '127.0.0.1'}:9050",
     }
 
-    data = {"headers": [], "content": [], "author": [], "date": []}
+    data = []
 
     for search in keywords:
         # Scrapping
@@ -69,11 +69,7 @@ def scraper_request(url, keywords=[]):
         print("\tAdding data to object..")
         for index in range(len(headers)):
             author_date = author[index * 2].text.split("at")
-
-            data['headers'].append(headers[index].text.strip())
-            data['content'].append(content[index].text.strip())
-            data['author'].append(
-                author_date[0].strip().replace("Posted by ", ""))
-            data['date'].append(
-                author_date[1].strip())
+            data_dict = {"header": headers[index].text.strip(), "content": content[index].text.strip(
+            ), "author": author_date[0].strip().replace("Posted by ", ""), "date": author_date[1].strip()}
+            data.append(data_dict)
     return data

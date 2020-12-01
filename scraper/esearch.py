@@ -69,9 +69,9 @@ def store_record(elastic_object, index_name, doc_type, record):
         return is_stored
 
 
-def connect_elasticsearch():
+def connect_elasticsearch(host = 'localhost'):
     _es = None
-    _es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+    _es = Elasticsearch([{'host': host, 'port': 9200}])
     if _es.ping():
         print('Yay Connected!')
     else:

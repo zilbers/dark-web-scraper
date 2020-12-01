@@ -4,6 +4,7 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
     container_name: elasticsearch
+    hostname: elasticsearch
     ports:
       - 9200:9200
       - 9300:9300
@@ -17,11 +18,12 @@ services:
       app-network:
         ipv4_address: 172.22.0.10
 
-  server:
+  node-server:
     build:
       context: './server'
       dockerfile: Dockerfile
     container_name: node-server
+    hostname: node-server
     ports:
       - '8080:8080'
     volumes:
