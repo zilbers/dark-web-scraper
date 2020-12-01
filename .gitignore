@@ -1,0 +1,8 @@
+.vscode/settings.json
+scraper/data
+scraper/geckodriver.log
+venv
+node_modules
+server/.env
+client/.eslintcache
+__pycache__
