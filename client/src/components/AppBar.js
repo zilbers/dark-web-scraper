@@ -121,7 +121,12 @@ export default function PrimarySearchAppBar({
 
   const checkStatus = async () => {
     const { data: results } = await axios.get('/api/data/_status');
-    setScraperStatus(results);
+    console.log(results);
+    setScraperStatus(
+      results.message
+        ? results
+        : { message: 'Something is wrong', active: false }
+    );
   };
 
   const showAll = async () => {
