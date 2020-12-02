@@ -28,7 +28,9 @@ export default function BasicTextFields({ value, setValue, label, setPage }) {
           id='standard-basic'
           label={label}
           onChange={({ target }) => {
-            setPage ? setPage(0) : '';
+            if (setPage) {
+              setPage(0);
+            }
             setValue(target.value);
           }}
           value={value}
