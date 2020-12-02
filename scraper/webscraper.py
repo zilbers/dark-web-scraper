@@ -13,7 +13,7 @@ import os
 URL = "http://nzxj65x32vh2fkhk.onion/"
 
 # Keywords to search
-KEYWORDS = ["all", "DDOS", "exploits", "attack", "money", "bitcoin", "passwords", "information", "market", "explosives", "weapons", "hacked", "password", "wallet", "ransomware", "hacked", "stolen", "admin", "blockchain", "cryptocurrency",
+KEYWORDS = ["all", "DDOS", "exploits", "credit cards", "attack", "bitcoin", "passwords", "information", "market", "explosives", "weapons", "hacked", "password", "wallet", "ransomware", "stolen", "admin", "blockchain", "cryptocurrency",
             "username", "account", "dollar", "biometric", "money", "forbidden", "leaked", "fullz", "Взломщик", "Залив", "Безнал", "Взлом", "dump data", "security", "payment"]
 
 # KEYWORDS = ["all"]
@@ -56,7 +56,7 @@ def main():
     url = os.environ.get('NODE_SERVER')
     # es = connect_elasticsearch(host if host != None else 'localhost')
     # create_index(es, 'data', settings)
-    
+
     while True:
         print("\nSetting up your Proxy to browse the dark web!")
         data = scraper_request(URL, KEYWORDS)
@@ -85,7 +85,8 @@ def main():
         # csvFilePath = path + '/ForumScrape.csv'
         # jsonFilePath = path + '/ForumScrape.json'
         # make_json(csvFilePath, jsonFilePath)
-        res = requests.post(url + '/api/data' if url != None else 'http://localhost:8080/api/data', json = data)
+        res = requests.post(url + '/api/data' if url !=
+                            None else 'http://localhost:8080/api/data', json=data)
         print(f'Data sent to server and, {res}')
 
         wait = 2
