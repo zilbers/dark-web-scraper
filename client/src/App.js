@@ -33,8 +33,14 @@ function App() {
     setData(results);
   };
 
+  const getHiding = async () => {
+    const { data: results } = await axios.get('/api/user/_alerts');
+    setHiding(results.hiding);
+  };
+
   useEffect(() => {
     getData();
+    getHiding();
   }, []);
 
   return (

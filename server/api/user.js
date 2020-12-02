@@ -1,27 +1,23 @@
 const { Router } = require('express');
 const router = Router();
 
-// Posts seen bins
-router.get('/', async (req, res) => {
-  try {
-    const { body: result } = await client.search(
-      {
-        index: 'data',
-        body: {
-          query: {
-            match_all: {},
-          },
-        },
-        size: 1000,
-      },
-      {
-        ignore: [404],
-        maxRetries: 3,
-      }
-    );
+let hiding = [];
 
-    const sourceArr = result.hits.hits.map((item) => item._source);
-    res.json(sourceArr);
+// Gets seen bins
+router.get('/_alerts', async (req, res) => {
+  try {
+    res.json({ hiding });
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
+// Posts seen bins
+router.post('/_alerts', async (req, res) => {
+  try {
+    const { body } = req;
+    hiding = body;
+    res.json({ message: 'updated' });
   } catch ({ message }) {
     res.status(500).send(message);
   }

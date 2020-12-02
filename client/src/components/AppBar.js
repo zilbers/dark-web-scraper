@@ -124,6 +124,11 @@ export default function PrimarySearchAppBar({
     setScraperStatus(results);
   };
 
+  const showAll = async () => {
+    axios.post('/api/user/_alerts', []);
+    setHiding([]);
+  };
+
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -235,7 +240,7 @@ export default function PrimarySearchAppBar({
             <IconButton
               aria-label='new entries'
               color='inherit'
-              onClick={() => setHiding([])}
+              onClick={showAll}
             >
               <Badge badgeContent={deleted} color='secondary'>
                 <ReplayIcon />

@@ -10,6 +10,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import styled, { css } from 'styled-components';
 import Input from './Input';
+import axios from 'axios';
 import './Bins.css';
 
 const useStyles = makeStyles({
@@ -72,9 +73,9 @@ export default function Bins({ hiding, setHiding }) {
     [loading, hasMore]
   );
 
-  const handleClose = (index) => {
+  const handleClose = async (index) => {
     setHiding((old) => [...old, index]);
-    console.log(hiding.includes(index));
+    axios.post('/api/user/_alerts', [...hiding, index]);
   };
 
   return (
