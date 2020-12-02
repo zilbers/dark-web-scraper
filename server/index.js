@@ -16,6 +16,7 @@ function logger(req, res, next) {
 app.use(logger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use('/', express.static('./build/'));
 app.use('/api/', require('./api'));
 
 app.get('/ping', (req, res) => {

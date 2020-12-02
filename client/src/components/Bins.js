@@ -9,8 +9,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import styled, { css } from 'styled-components';
-// import Select from './Select';
 import Input from './Input';
+import './Bins.css';
 
 const useStyles = makeStyles({
   container: {
@@ -20,8 +20,6 @@ const useStyles = makeStyles({
     flexGgrow: 2,
   },
 });
-const formatDate = (dateObj) =>
-  `${dateObj.getFullYear()}-${dateObj.getMonth() + 1}-${dateObj.getDate()}`;
 
 const columns = [
   { id: 'header', label: 'Header', minWidth: 170 },
@@ -36,10 +34,6 @@ const columns = [
     label: 'Date',
     minWidth: 100,
   },
-];
-const sortingOptions = [
-  { label: 'From End', value: '-date' },
-  { label: 'From Start', value: '+date' },
 ];
 
 const OptionsContainer = styled.div`
@@ -130,6 +124,7 @@ export default function Bins({ hiding, setHiding }) {
                           ref={lastLogElementRef}
                           onClick={() => handleClose(index)}
                           key={bin.header}
+                          className='tr'
                         >
                           <TableCell>{bin.header}</TableCell>
                           <TableCell>{bin.content}</TableCell>
@@ -140,6 +135,7 @@ export default function Bins({ hiding, setHiding }) {
                         <TableRow
                           key={bin.header}
                           onClick={() => handleClose(index)}
+                          className='tr'
                         >
                           <TableCell>{bin.header}</TableCell>
                           <TableCell>{bin.content}</TableCell>
