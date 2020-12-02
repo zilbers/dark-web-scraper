@@ -10,8 +10,11 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 import CheckBox from './CheckBox';
+import Input from './Input';
 
 const Container = styled.div`
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
   @media (max-width: 750px) {
     width: 100%;
@@ -30,6 +33,24 @@ const Container = styled.div`
   }
 `;
 
+const OptionsContainer = styled.div`
+  align-self: center;
+  @media (max-width: 750px) {
+    width: 100%;
+  }
+
+  @media (min-width: 750px) {
+    width: 70%;
+  }
+
+  @media (min-width: 900px) {
+    width: 40%;
+  }
+
+  @media (min-width: 1600px) {
+    width: 300px;
+  }
+`;
 const COLORS = [
   '#0088FE',
   '#00C49F',
@@ -113,13 +134,15 @@ const renderActiveShape = (props) => {
   );
 };
 
-function Chart({ url, wordList }) {
+function Chart({ url }) {
   const [data, setData] = useState([]);
   const [ready, setReady] = useState(false);
+  const [input, setInput] = useState('');
+  const [wordList, setWordList] = useState([]);
   const [showing, setShowing] = useState(() => {
     const newShowing = {};
     for (const key of wordList) {
-      newShowing[key] = false;
+      newShowing[key] = true;
     }
     return newShowing;
   });
@@ -140,6 +163,11 @@ function Chart({ url, wordList }) {
     setActiveIndex(index);
   };
 
+  const handleClick = () => {
+    setWordList((oldList) => [...oldList, input]);
+    setInput('');
+  };
+
   useEffect(() => {
     getAndSet(url, wordList, setData);
     setReady(true);
@@ -149,11 +177,16 @@ function Chart({ url, wordList }) {
     <>
       <Container>
         <h3>Keywords Appearance</h3>
-        <CheckBox
-          showing={showing}
-          setShowing={setShowing}
-          options={wordList}
-        />
+        <OptionsContainer>
+          <Input value={input} setValue={setInput} label='Search' />
+          <button onClick={handleClick}>Add</button>
+
+          <CheckBox
+            showing={showing}
+            setShowing={setShowing}
+            options={wordList}
+          />
+        </OptionsContainer>
         {ready && (
           <ResponsiveContainer width='100%' aspect={4.0 / 3.0} maxHeight={300}>
             <PieChart width={730} height={250}>
