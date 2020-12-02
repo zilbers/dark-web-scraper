@@ -87,6 +87,7 @@ const useStyles = makeStyles((theme) => ({
 export default function PrimarySearchAppBar({
   length,
   deleted,
+  setHiding,
   setInputText,
   inputText,
 }) {
@@ -231,7 +232,11 @@ export default function PrimarySearchAppBar({
           </div> */}
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <IconButton aria-label='new entries' color='inherit'>
+            <IconButton
+              aria-label='new entries'
+              color='inherit'
+              onClick={() => setHiding([])}
+            >
               <Badge badgeContent={deleted} color='secondary'>
                 <ReplayIcon />
               </Badge>

@@ -155,6 +155,49 @@ router.get('/_label', async (req, res) => {
   }
 });
 
+// Get scraper status
+router.get('/_status', async (req, res) => {
+  try {
+    res.json(status);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
+// Get by page
+router.get('/_bins/:page', async (req, res) => {
+  try {
+    const page = Number(req.params.page);
+    const { q } = req.query;
+    const body = q
+      ? {
+          index: 'data',
+          q: `*${q}*`,
+          // q,
+          size: 1000,
+        }
+      : {
+          index: 'data',
+          body: {
+            query: {
+              match_all: {},
+            },
+          },
+          size: 1000,
+        };
+    const { body: result } = await client.search(body, {
+      ignore: [404],
+      maxRetries: 3,
+    });
+
+    const sourceArr = result.hits.hits.map((item) => item._source);
+
+    res.send(sourceArr.slice(page * 10, page * 10 + 10));
+  } catch (err) {
+    res.status(500).send({ error: err });
+  }
+});
+
 // Analyze bins
 router.post('/_sentiment', async (req, res) => {
   try {
@@ -205,49 +248,6 @@ router.post('/_sentiment', async (req, res) => {
     res.json(result);
   } catch ({ message }) {
     res.status(500).send(message);
-  }
-});
-
-// Get scraper status
-router.get('/_status', async (req, res) => {
-  try {
-    res.json(status);
-  } catch ({ message }) {
-    res.status(500).send(message);
-  }
-});
-
-// Get by page
-router.get('/_bins/:page', async (req, res) => {
-  try {
-    const page = Number(req.params.page);
-    const { q } = req.query;
-    const body = q
-      ? {
-          index: 'data',
-          q: `*${q}*`,
-          // q,
-          size: 1000,
-        }
-      : {
-          index: 'data',
-          body: {
-            query: {
-              match_all: {},
-            },
-          },
-          size: 1000,
-        };
-    const { body: result } = await client.search(body, {
-      ignore: [404],
-      maxRetries: 3,
-    });
-
-    const sourceArr = result.hits.hits.map((item) => item._source);
-
-    res.send(sourceArr.slice(page * 10, page * 10 + 10));
-  } catch (err) {
-    res.status(500).send({ error: err });
   }
 });
 

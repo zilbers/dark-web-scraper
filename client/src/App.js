@@ -25,7 +25,7 @@ const Container = styled.div`
 
 function App() {
   const [data, setData] = useState();
-  const [viewed, setViewed] = useState([]);
+  const [hiding, setHiding] = useState([]);
   const { inputText, setInputText, searchResults } = useSearchInDb();
 
   const getData = async () => {
@@ -42,13 +42,14 @@ function App() {
       {data && (
         <>
           <AppBar
-            length={data.length}
-            deleted={data.length - data.length}
+            length={data.length - hiding.length}
+            deleted={hiding.length}
             inputText={inputText}
             setInputText={setInputText}
+            setHiding={setHiding}
           />
           <Container>
-            <Bins />
+            <Bins hiding={hiding} setHiding={setHiding} />
             <LineChart
               url='api/data/_sentiment'
               data={data}

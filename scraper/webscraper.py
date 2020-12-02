@@ -87,13 +87,14 @@ def main():
         # csvFilePath = path + '/ForumScrape.csv'
         # jsonFilePath = path + '/ForumScrape.json'
         # make_json(csvFilePath, jsonFilePath)
+        wait = 2
+
         requests.post(url + '/api/data/_status' if url !=
-                      None else 'http://localhost:8080/api/data/_status', json={'message': 'Waiting!', 'active': False})
+                      None else 'http://localhost:8080/api/data/_status', json={'message': f'On {wait} cooldown!', 'active': False})
         res = requests.post(url + '/api/data' if url !=
                             None else 'http://localhost:8080/api/data', json=data)
         print(f'Data sent to server and, {res}')
 
-        wait = 2
         print(f"Waiting {wait} minutes before next interval")
         time.sleep(wait * 60)
 

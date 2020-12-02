@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import useLogsSearch from '../hooks/useLogsSearch';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -49,7 +49,8 @@ const OptionsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-export default function App() {
+export default function Bins({ hiding, setHiding }) {
+  // const [showing, setShowing] = useState();
   const [pageNumber, setPageNumber] = useState(0);
   const [search, setSearch] = useState(() => '');
   const [sort, setSort] = useState(() => '');
@@ -59,9 +60,10 @@ export default function App() {
     search,
     sort
   );
-  const classes = useStyles();
 
+  const classes = useStyles();
   const observer = useRef();
+
   const lastLogElementRef = useCallback(
     (node) => {
       if (loading) return;
@@ -75,6 +77,11 @@ export default function App() {
     },
     [loading, hasMore]
   );
+
+  const handleClose = (index) => {
+    setHiding((old) => [...old, index]);
+    console.log(hiding.includes(index));
+  };
 
   return (
     <>
@@ -109,23 +116,41 @@ export default function App() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {logs.map((bin, index) =>
-                logs.length === index + 1 ? (
-                  <TableRow ref={lastLogElementRef} key={bin}>
-                    <TableCell>{bin.header}</TableCell>
-                    <TableCell>{bin.content}</TableCell>
-                    <TableCell>{bin.author}</TableCell>
-                    <TableCell>{bin.date}</TableCell>
-                  </TableRow>
-                ) : (
-                  <TableRow key={bin}>
-                    <TableCell>{bin.header}</TableCell>
-                    <TableCell>{bin.content}</TableCell>
-                    <TableCell>{bin.author}</TableCell>
-                    <TableCell>{bin.date}</TableCell>
-                  </TableRow>
-                )
-              )}
+              {logs &&
+                logs
+                  .sort(function (a, b) {
+                    // Turn your strings into dates, and then subtract them
+                    // to get a value that is either negative, positive, or zero.
+                    return new Date(b.date) - new Date(a.date);
+                  })
+                  .map((bin, index) =>
+                    !hiding.includes(index) ? (
+                      logs.length === index + 1 ? (
+                        <TableRow
+                          ref={lastLogElementRef}
+                          onClick={() => handleClose(index)}
+                          key={bin.header}
+                        >
+                          <TableCell>{bin.header}</TableCell>
+                          <TableCell>{bin.content}</TableCell>
+                          <TableCell>{bin.author}</TableCell>
+                          <TableCell>{bin.date}</TableCell>
+                        </TableRow>
+                      ) : (
+                        <TableRow
+                          key={bin.header}
+                          onClick={() => handleClose(index)}
+                        >
+                          <TableCell>{bin.header}</TableCell>
+                          <TableCell>{bin.content}</TableCell>
+                          <TableCell>{bin.author}</TableCell>
+                          <TableCell>{bin.date}</TableCell>
+                        </TableRow>
+                      )
+                    ) : (
+                      ''
+                    )
+                  )}
             </TableBody>
           </Table>
         </TableContainer>
