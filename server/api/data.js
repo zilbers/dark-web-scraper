@@ -91,7 +91,7 @@ router.get('/_search', async (req, res) => {
     const { body: result } = await client.search(
       {
         index: 'data',
-        q,
+        q: `*${q}*`,
         size: 1000,
       },
       {
