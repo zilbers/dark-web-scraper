@@ -59,6 +59,8 @@ def main():
 
     while True:
         print("\nSetting up your Proxy to browse the dark web!")
+        requests.post(url + '/api/data/_status' if url !=
+                      None else 'http://localhost:8080/api/data/_status', json={'message': 'Scraping!', 'active': True})
         data = scraper_request(URL, KEYWORDS)
         # path = os.environ.get('DATA_PATH')
 
@@ -85,6 +87,8 @@ def main():
         # csvFilePath = path + '/ForumScrape.csv'
         # jsonFilePath = path + '/ForumScrape.json'
         # make_json(csvFilePath, jsonFilePath)
+        requests.post(url + '/api/data/_status' if url !=
+                      None else 'http://localhost:8080/api/data/_status', json={'message': 'Waiting!', 'active': False})
         res = requests.post(url + '/api/data' if url !=
                             None else 'http://localhost:8080/api/data', json=data)
         print(f'Data sent to server and, {res}')

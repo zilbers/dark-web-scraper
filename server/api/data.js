@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { Client } = require('@elastic/elasticsearch');
 const Sentiment = require('sentiment');
+const crypto = require('crypto');
 
 // Helpers
 async function indices(client, index, properties) {
@@ -78,6 +79,8 @@ const KEYWORDS = [
 
 const router = Router();
 
+let status = {};
+
 // ENTRYPOINTS
 // Get data
 router.get('/', async (req, res) => {
@@ -113,6 +116,7 @@ router.get('/_search', async (req, res) => {
       {
         index: 'data',
         q: `*${q}*`,
+        // q,
         size: 1000,
       },
       {
@@ -128,7 +132,30 @@ router.get('/_search', async (req, res) => {
   }
 });
 
-// Analyze bin
+// Find by word
+router.get('/_label', async (req, res) => {
+  try {
+    const { q } = req.query;
+    const { body: result } = await client.search(
+      {
+        index: 'data',
+        q: `*${q}*`,
+        // q,
+        size: 1000,
+      },
+      {
+        ignore: [404],
+        maxRetries: 3,
+      }
+    );
+
+    res.json({ label: q, value: result.hits.hits.length });
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
+// Analyze bins
 router.post('/_sentiment', async (req, res) => {
   try {
     // const { q: id } = req.query;
@@ -150,26 +177,86 @@ router.post('/_sentiment', async (req, res) => {
     // );
 
     // const sourceArr = queryResult.hits.hits.map((item) => item._source);
-    let result = { score: 0, comparative: 0, words: [] };
+
+    let result = [];
     const { body } = req;
 
     if (body) {
-      const object = body;
       const sentiment = new Sentiment();
-      for (const property in object) {
-        const analyzedItem = sentiment.analyze(object[property], {
-          extras: KEYWORDS,
-        });
-        if (Number.isInteger(analyzedItem.score)) {
-          result.score += analyzedItem.score;
-          result.comparative += analyzedItem.comparative;
+
+      for (const item of body) {
+        let current = { score: 0, comparative: 0, words: [] };
+
+        for (const property in item) {
+          const analyzedItem = sentiment.analyze(item[property], {
+            extras: KEYWORDS,
+          });
+          if (Number.isInteger(analyzedItem.score)) {
+            current.score += analyzedItem.score;
+            current.comparative += analyzedItem.comparative;
+          }
+          if (analyzedItem.words[0]) {
+            current.words.push(...analyzedItem.words);
+          }
         }
-        if (analyzedItem.words[0]) {
-          result.words.push(...analyzedItem.words);
-        }
+        result.push(current);
       }
     }
     res.json(result);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
+// Get scraper status
+router.get('/_status', async (req, res) => {
+  try {
+    res.json(status);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
+// Get by page
+router.get('/_bins/:page', async (req, res) => {
+  try {
+    const page = Number(req.params.page);
+    const { q } = req.query;
+    const body = q
+      ? {
+          index: 'data',
+          q: `*${q}*`,
+          // q,
+          size: 1000,
+        }
+      : {
+          index: 'data',
+          body: {
+            query: {
+              match_all: {},
+            },
+          },
+          size: 1000,
+        };
+    const { body: result } = await client.search(body, {
+      ignore: [404],
+      maxRetries: 3,
+    });
+
+    const sourceArr = result.hits.hits.map((item) => item._source);
+
+    res.send(sourceArr.slice(page * 10, page * 10 + 10));
+  } catch (err) {
+    res.status(500).send({ error: err });
+  }
+});
+
+// Set scraper status
+router.post('/_status', async (req, res) => {
+  try {
+    const { body } = req;
+    status = body;
+    res.json({ message: 'COOL, COOL, COOL' });
   } catch ({ message }) {
     res.status(500).send(message);
   }
@@ -179,16 +266,16 @@ router.post('/_sentiment', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const index = 'data';
-
-    await indices(client, 'data', dataProps);
+    await indices(client, index, dataProps);
 
     const { body: data } = req;
     const body = data.flatMap((doc) => {
-      const _id = doc._id.slice();
-      delete doc._id;
+      const _id = crypto
+        .createHash('md5')
+        .update(doc.date + doc.header)
+        .digest('hex');
       return [{ index: { _index: index, _type: 'data', _id } }, doc];
     });
-
     const bulkResponse = await client.bulk({ refresh: true, body });
     res.json(bulkResponse);
   } catch ({ message }) {

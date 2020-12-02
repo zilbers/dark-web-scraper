@@ -16,6 +16,9 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import NewReleasesIcon from '@material-ui/icons/NewReleases';
 import ReplayIcon from '@material-ui/icons/Replay';
+import WorkIcon from '@material-ui/icons/Work';
+import WorkOffIcon from '@material-ui/icons/WorkOff';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -89,6 +92,10 @@ export default function PrimarySearchAppBar({
 }) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [scraperStatus, setScraperStatus] = React.useState({
+    message: 'Waiting for update!',
+    active: false,
+  });
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
   const isMenuOpen = Boolean(anchorEl);
@@ -111,6 +118,11 @@ export default function PrimarySearchAppBar({
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  const checkStatus = async () => {
+    const { data: results } = await axios.get('/api/data/_status');
+    setScraperStatus(results);
+  };
+
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -122,8 +134,18 @@ export default function PrimarySearchAppBar({
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleMenuClose}>
+        Scraper Status:{' '}
+        <span
+          style={{
+            background: scraperStatus.active ? 'green' : 'red',
+            padding: '5px',
+            fontWeight: 600,
+          }}
+        >
+          {scraperStatus.message}
+        </span>
+      </MenuItem>
     </Menu>
   );
 
@@ -168,6 +190,13 @@ export default function PrimarySearchAppBar({
     </Menu>
   );
 
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      checkStatus();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className={classes.grow}>
       <AppBar position='static'>
@@ -183,7 +212,7 @@ export default function PrimarySearchAppBar({
           <Typography className={classes.title} variant='h6' noWrap>
             Dark-Web-Scraper
           </Typography>
-          <div className={classes.search}>
+          {/* <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
             </div>
@@ -199,7 +228,7 @@ export default function PrimarySearchAppBar({
               }}
               value={inputText}
             />
-          </div>
+          </div> */}
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             <IconButton aria-label='new entries' color='inherit'>
@@ -214,13 +243,40 @@ export default function PrimarySearchAppBar({
             </IconButton>
             <IconButton
               edge='end'
-              aria-label='account of current user'
+              aria-label='Scraper status'
               aria-controls={menuId}
               aria-haspopup='true'
               onClick={handleProfileMenuOpen}
               color='inherit'
             >
-              <AccountCircle />
+              {scraperStatus.active ? (
+                <>
+                  <div
+                    style={{
+                      background: 'green',
+                      display: 'flex',
+                      padding: '5px',
+                    }}
+                  >
+                    <WorkIcon />
+                    {'  '}
+                    on
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div
+                    style={{
+                      background: 'red',
+                      display: 'flex',
+                      padding: '5px',
+                    }}
+                  >
+                    <WorkOffIcon /> {'  '}
+                    off
+                  </div>
+                </>
+              )}
             </IconButton>
           </div>
           <div className={classes.sectionMobile}>

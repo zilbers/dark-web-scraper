@@ -70,7 +70,7 @@ def scraper_request(url, keywords=[]):
         for index in range(len(headers)):
             author_date = author[index * 2].text.split("at")
             data_dict = {
-                '_id': str(hash(headers[index].text.strip() + author_date[1].strip())), "header": headers[index].text.strip(), "content": content[index].text.strip(
+                "header": headers[index].text.strip(), "content": content[index].text.strip(
                 ), "author": author_date[0].strip().replace("Posted by ", ""), "date": author_date[1].strip()}
             data.append(data_dict)
     return data
