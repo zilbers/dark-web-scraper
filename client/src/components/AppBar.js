@@ -122,7 +122,8 @@ export default function PrimarySearchAppBar({
 
   const checkStatus = async () => {
     const { data: results } = await axios.get('/api/data/_status');
-    if (results.active === false) {
+    if (!results.checked && results.active === false) {
+      await axios.get('/api/data/_check');
       getData();
     }
     setScraperStatus(

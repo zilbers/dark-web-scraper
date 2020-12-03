@@ -164,6 +164,16 @@ router.get('/_status', async (req, res) => {
   }
 });
 
+// Get scraper status
+router.get('/_check', async (req, res) => {
+  try {
+    status.checked = true;
+    res.json(status);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
 // Get by page
 router.get('/_bins/:page', async (req, res) => {
   try {
