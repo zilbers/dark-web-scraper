@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
@@ -18,6 +19,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use('/', express.static('./build/'));
 app.use('/api/', require('./api'));
+
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('connected to MongoDB!');
+  })
+  .catch((error) => {
+    console.log('Error connecting to MongoDB:', error.message);
+  });
 
 app.get('/ping', (req, res) => {
   try {

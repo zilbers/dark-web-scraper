@@ -1,25 +1,66 @@
+const { ObjectId } = require('mongodb');
 const { Router } = require('express');
-const router = Router();
+//mongoDB models:
+const User = require('../models/user');
 
-let hiding = [];
+const router = Router();
 
 // Gets seen bins
 router.get('/_alerts', async (req, res) => {
   try {
+    const { id: _id } = req.query;
+    const { alerts: hiding } = await User.findOne({ _id });
+
     res.json({ hiding });
   } catch ({ message }) {
     res.status(500).send(message);
   }
 });
 
-// Posts seen bins
-router.post('/_alerts', async (req, res) => {
+// Get all users
+router.get('/_all', async (req, res) => {
   try {
-    const { body } = req;
-    hiding = body;
-    res.json({ message: 'updated' });
+    const users = await User.find({});
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+});
+
+// Posts seen bins
+router.put('/_alerts', async (req, res) => {
+  try {
+    const { body: alerts } = req;
+    const { id } = req.query;
+
+    User.update({ _id: ObjectId(id) }, { $set: { alerts } })
+      .then(() => res.status(201).json('Updated alerts!'))
+      .catch((e) => res.status(404).json(e));
+    // res.json({ message: 'updated' });
   } catch ({ message }) {
     res.status(500).send(message);
+  }
+});
+
+// Register new user
+router.post('/_new', (req, res) => {
+  try {
+    const { body: rawUserData } = req;
+
+    const user = new User({
+      ...rawUserData,
+      _id: new ObjectId(),
+      createdAt: new Date(),
+      updatedAt: null,
+      deletedAt: null,
+    });
+
+    user
+      .save(user)
+      .then(() => res.status(201).json('Created user!'))
+      .catch(() => res.status(404).json('The email is already in use!'));
+  } catch (error) {
+    res.status(500).json({ error });
   }
 });
 

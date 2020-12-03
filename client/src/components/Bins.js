@@ -15,15 +15,18 @@ import './Bins.css';
 
 const useStyles = makeStyles({
   container: {
-    maxHeight: 250,
+    height: '30vh',
+    width: '100%',
   },
   root: {
     flexGgrow: 2,
+    height: '30vh',
+    width: '100%',
   },
 });
 
 const columns = [
-  { id: 'header', label: 'Header', minWidth: 170 },
+  { id: 'header', label: 'Header', minWidth: 100 },
   { id: 'content', label: 'Content', minWidth: 100 },
   {
     id: 'author',
