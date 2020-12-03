@@ -1,10 +1,42 @@
 const { Router } = require('express');
-const csv = require('csv-parser');
 const { Client } = require('@elastic/elasticsearch');
-const fs = require('fs');
+const Sentiment = require('sentiment');
+const crypto = require('crypto');
+// MongoDB models:
+const User = require('../models/user');
+
+// Helpers
+async function indices(client, index, properties) {
+  client.indices.exists(
+    {
+      index,
+    },
+    (err, res, status) => {
+      if (res.body) {
+        console.log('Index exists!');
+      } else {
+        client.indices.create(
+          {
+            index,
+            body: {
+              mappings: {
+                properties: {
+                  ...properties,
+                },
+              },
+            },
+          },
+          (err, res, status) => {
+            console.log(err, res, status);
+          }
+        );
+      }
+    }
+  );
+}
 
 const client = new Client({
-  node: `http://${process.env.HOST}:9200` || 'http://localhost:9200',
+  node: process.env.HOST || 'http://localhost:9200',
   maxRetries: 5,
   requestTimeout: 60000,
   sniffOnStart: true,
@@ -25,8 +57,33 @@ const dataProps = {
   },
 };
 
+const KEYWORDS = [
+  { DDOS: -3 },
+  { exploits: -4 },
+  { attack: -3 },
+  { money: -2 },
+  { bitcoin: -2 },
+  { passwords: -5 },
+  { information: -2 },
+  { explosives: -5 },
+  { weapons: -5 },
+  { hacked: -4 },
+  { password: -5 },
+  { ransomware: -4 },
+  { stolen: -5 },
+  { username: -5 },
+  { account: -3 },
+  { leaked: -5 },
+  { fullz: -3 },
+  { 'dump data': -3 },
+  { 'credit cards': -5 },
+];
+
 const router = Router();
 
+let status = {};
+
+// ENTRYPOINTS
 // Get data
 router.get('/', async (req, res) => {
   try {
@@ -46,61 +103,208 @@ router.get('/', async (req, res) => {
       }
     );
 
-    res.json(result.hits);
+    const sourceArr = result.hits.hits.map((item) => ({
+      ...item._source,
+      id: item._id,
+    }));
+
+    res.json(sourceArr);
   } catch ({ message }) {
     res.status(500).send(message);
   }
 });
 
-// Get data
-// router.get('/', async (req, res) => {
-//   try {
-//     const results = [];
+// Search in data
+router.get('/_search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    const { body: result } = await client.search(
+      {
+        index: 'data',
+        q: `*${q}*`,
+        // q,
+        size: 1000,
+      },
+      {
+        ignore: [404],
+        maxRetries: 3,
+      }
+    );
+    const sourceArr = result.hits.hits.map((item) => ({
+      ...item._source,
+      id: item._id,
+    }));
 
-//     await new Promise((resolve, reject) => {
-//       fs.createReadStream('../scraper/data/ForumScrape.csv')
-//         .pipe(csv())
-//         .on('data', (data) => results.push(data))
-//         .on('end', () => {
-//           resolve();
-//         });
-//     });
+    res.json(sourceArr);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
 
-//     res.json(results);
-//   } catch ({ message }) {
-//     res.status(500).send(message);
-//   }
-// });
+// Find by word
+router.get('/_label', async (req, res) => {
+  try {
+    const { q } = req.query;
+    const { body: result } = await client.search(
+      {
+        index: 'data',
+        q: `*${q}*`,
+        // q,
+        size: 1000,
+      },
+      {
+        ignore: [404],
+        maxRetries: 3,
+      }
+    );
 
-// // Get links
-// router.get('/links', async (req, res) => {
-//   try {
-//     const results = [];
+    res.json({ label: q, value: result.hits.hits.length });
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
 
-//     await new Promise((resolve, reject) => {
-//       fs.createReadStream('../scraper/data/Links.csv')
-//         .pipe(csv())
-//         .on('data', (data) => results.push(data))
-//         .on('end', () => {
-//           resolve();
-//         });
-//     });
+// Get scraper status
+router.get('/_status', async (req, res) => {
+  try {
+    res.json(status);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
 
-//     res.json(results);
-//   } catch ({ message }) {
-//     res.status(500).send(message);
-//   }
-// });
+// Get scraper status
+router.get('/_check', async (req, res) => {
+  try {
+    status.checked = true;
+    res.json(status);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
 
-// // Get new scraped data
-// router.post('/', async (req, res) => {
-//   try {
-//     const { body: data } = req;
-//     fs.writeFile('test', JSON.stringify(data), 'utf-8');
-//     res.json('Saved data');
-//   } catch ({ message }) {
-//     res.status(500).send(message);
-//   }
-// });
+// Get by page
+router.get('/_bins/:page', async (req, res) => {
+  try {
+    const page = Number(req.params.page);
+    const { q, id: _id } = req.query;
+    // const { alerts: hiding } = await User.findOne({ _id });
+    const body = q
+      ? {
+          index: 'data',
+          q: `*${q}*`,
+          // q,
+          size: 1000,
+        }
+      : {
+          index: 'data',
+          body: {
+            query: {
+              match_all: {},
+            },
+          },
+          size: 1000,
+        };
+    const { body: result } = await client.search(body, {
+      ignore: [404],
+      maxRetries: 3,
+    });
+
+    const sourceArr = result.hits.hits.map((item) => ({
+      ...item._source,
+      id: item._id,
+    }));
+    // .filter(({ id }) => !hiding.includes(id));
+
+    res.send(sourceArr.slice(page * 20, page * 20 + 20));
+  } catch (err) {
+    res.status(500).send({ error: err });
+  }
+});
+
+// Analyze bins
+router.post('/_sentiment', async (req, res) => {
+  try {
+    // const { q: id } = req.query;
+    // const { body: queryResult } = await client.search(
+    //   {
+    //     index: 'data',
+    //     body: {
+    //       query: {
+    //         terms: {
+    //           _id: [id],
+    //         },
+    //       },
+    //     },
+    //   },
+    //   {
+    //     ignore: [404],
+    //     maxRetries: 3,
+    //   }
+    // );
+
+    // const sourceArr = queryResult.hits.hits.map((item) => item._source);
+
+    let result = [];
+    const { body } = req;
+
+    if (body) {
+      const sentiment = new Sentiment();
+
+      for (const item of body) {
+        let current = { score: 0, comparative: 0, words: [] };
+
+        for (const property in item) {
+          const analyzedItem = sentiment.analyze(item[property], {
+            extras: KEYWORDS,
+          });
+          if (Number.isInteger(analyzedItem.score)) {
+            current.score += analyzedItem.score;
+            current.comparative += analyzedItem.comparative;
+          }
+          if (analyzedItem.words[0]) {
+            current.words.push(...analyzedItem.words);
+          }
+        }
+        result.push(current);
+      }
+    }
+    res.json(result);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
+// Set scraper status
+router.post('/_status', async (req, res) => {
+  try {
+    const { body } = req;
+    status = body;
+    res.json({ message: 'COOL, COOL, COOL' });
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
+// Post new data
+router.post('/', async (req, res) => {
+  try {
+    const index = 'data';
+    await indices(client, index, dataProps);
+
+    const { body: data } = req;
+    const body = data.flatMap((doc) => {
+      const _id = crypto
+        .createHash('md5')
+        .update(doc.date + doc.header)
+        .digest('hex');
+      return [{ index: { _index: index, _type: 'data', _id } }, doc];
+    });
+    const bulkResponse = await client.bulk({ refresh: true, body });
+    res.json(bulkResponse);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
 
 module.exports = router;

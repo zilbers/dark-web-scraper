@@ -31,7 +31,9 @@ services:
     environment:
       - PORT=8080
       - NODE_ENV=development
-      - HOST=elasticsearch
+      - HOST=http://elasticsearch:9200
+      - PYTHONUNBUFFERED=TRUE
+    command: sh -c '/src/app/wait_for_it.sh elasticsearch:9200 && npm run dev'
 
     networks:
       app-network:
@@ -58,14 +60,13 @@ services:
     environment:
       - PROXY=tor
       - HOST=elasticsearch
+      - NODE_SERVER=http://node-server:8080
     ports:
       - '80:80'
       - '8000:8000'
     volumes:
-      - type: bind
-        source: .
-        target: /scraper
-    command: sh -c '/app/app/wait_for_it.sh elasticsearch:9200 && /app/app/wait_for_it.sh tor:9050 && python /app/webscraper.py'
+      - ./scraper:/app
+    command: sh -c '/app/wait_for_it.sh elasticsearch:9200 && /app/wait_for_it.sh tor:9050 && /app/wait_for_it.sh node-server:8080 && python /app/webscraper.py'
 
     networks:
       app-network:

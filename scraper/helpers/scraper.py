@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from helpers.set_driver import set_driver
+import logging
 import os
 
 
@@ -40,7 +41,7 @@ def scraper_selenium(url, keywords=[]):
 
 # Scrapes the data and returns a JSON with the content, using requests
 def scraper_request(url, keywords=[]):
-    print(f"Scraping {url}")
+    logging.info(f"Scraping {url}")
 
     host = os.environ.get('PROXY')
 
@@ -53,7 +54,7 @@ def scraper_request(url, keywords=[]):
 
     for search in keywords:
         # Scrapping
-        print(f"\nSearching: {search}..")
+        logging.info(f"\nSearching: {search}..")
         r = requests.get(
             f'{url}{search if search == "all" else f"search?q={search}"}', proxies=proxyDict)
 
@@ -63,13 +64,14 @@ def scraper_request(url, keywords=[]):
         author = soup.select('.col-sm-6')
 
         if len(headers) == 0:
-            print(f"\tNo data at: {search}!")
+            logging.info(f"\tNo data at: {search}!")
             continue
 
-        print("\tAdding data to object..")
-        for index in range(len(headers)):
+        logging.info("\tAdding data to object..")
+        for index in range(len(content)):
             author_date = author[index * 2].text.split("at")
-            data_dict = {"header": headers[index].text.strip(), "content": content[index].text.strip(
-            ), "author": author_date[0].strip().replace("Posted by ", ""), "date": author_date[1].strip()}
+            data_dict = {
+                "header": headers[index].text.strip(), "content": content[index].text.strip(
+                ), "author": author_date[0].strip().replace("Posted by ", ""), "date": author_date[1].strip()}
             data.append(data_dict)
     return data

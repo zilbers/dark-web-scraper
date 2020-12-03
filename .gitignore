@@ -6,3 +6,4 @@ node_modules
 server/.env
 client/.eslintcache
 __pycache__
+server/build

@@ -12,4 +12,4 @@ EXPOSE 8080
 
 COPY . /src
 
-CMD ["npm", "run", "dev"]
+# CMD ["npm", "run", "dev"]
