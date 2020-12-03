@@ -53,6 +53,7 @@ function App() {
             inputText={inputText}
             setInputText={setInputText}
             setHiding={setHiding}
+            getData={getData}
           />
           <Container>
             <Bins hiding={hiding} setHiding={setHiding} />

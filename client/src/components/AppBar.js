@@ -90,6 +90,7 @@ export default function PrimarySearchAppBar({
   setHiding,
   setInputText,
   inputText,
+  getData,
 }) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -121,7 +122,9 @@ export default function PrimarySearchAppBar({
 
   const checkStatus = async () => {
     const { data: results } = await axios.get('/api/data/_status');
-    console.log(results);
+    if (results.active === false) {
+      getData();
+    }
     setScraperStatus(
       results.message
         ? results
