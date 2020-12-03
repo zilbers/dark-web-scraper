@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useContext } from 'react';
 import useLogsSearch from '../hooks/useLogsSearch';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -11,6 +11,7 @@ import Paper from '@material-ui/core/Paper';
 import styled, { css } from 'styled-components';
 import Input from './Input';
 import axios from 'axios';
+import { UserContext } from '../context/UserContext';
 import './Bins.css';
 
 const useStyles = makeStyles({
@@ -47,8 +48,8 @@ const OptionsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-export default function Bins({ hiding, setHiding }) {
-  // const [showing, setShowing] = useState();
+export default function Bins({ hiding, setHiding, data }) {
+  const context = useContext(UserContext);
   const [pageNumber, setPageNumber] = useState(0);
   const [search, setSearch] = useState(() => '');
   const [sort, setSort] = useState(() => '');
@@ -56,7 +57,8 @@ export default function Bins({ hiding, setHiding }) {
   const { logs, hasMore, loading, error } = useLogsSearch(
     pageNumber,
     search,
-    sort
+    sort,
+    context.userId
   );
 
   const classes = useStyles();
@@ -76,9 +78,10 @@ export default function Bins({ hiding, setHiding }) {
     [loading, hasMore]
   );
 
-  const handleClose = async (index) => {
-    setHiding((old) => [...old, index]);
-    axios.post('/api/user/_alerts', [...hiding, index]);
+  const handleHide = async (id) => {
+    setHiding((old) => [...old, id]);
+    console.log([...hiding, id]);
+    axios.put(`/api/user/_alerts?id=${context.userId}`, [...hiding, id]);
   };
 
   return (
@@ -114,43 +117,48 @@ export default function Bins({ hiding, setHiding }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {logs &&
-                logs
+              {data &&
+                data
                   .sort(function (a, b) {
-                    // Turn your strings into dates, and then subtract them
-                    // to get a value that is either negative, positive, or zero.
                     return new Date(b.date) - new Date(a.date);
                   })
-                  .map((bin, index) =>
-                    !hiding.includes(index) ? (
-                      logs.length === index + 1 ? (
-                        <TableRow
-                          ref={lastLogElementRef}
-                          onClick={() => handleClose(index)}
-                          key={bin.header}
-                          className='tr'
-                        >
-                          <TableCell>{bin.header}</TableCell>
-                          <TableCell>{bin.content}</TableCell>
-                          <TableCell>{bin.author}</TableCell>
-                          <TableCell>{bin.date}</TableCell>
-                        </TableRow>
-                      ) : (
-                        <TableRow
-                          key={bin.header}
-                          onClick={() => handleClose(index)}
-                          className='tr'
-                        >
-                          <TableCell>{bin.header}</TableCell>
-                          <TableCell>{bin.content}</TableCell>
-                          <TableCell>{bin.author}</TableCell>
-                          <TableCell>{bin.date}</TableCell>
-                        </TableRow>
-                      )
-                    ) : (
-                      ''
-                    )
-                  )}
+                  .filter(({ id }) => !hiding.includes(id))
+                  .map((bin, index) => (
+                    // logs.length === index + 1 ? (
+                    //   <TableRow
+                    //     ref={lastLogElementRef}
+                    //     onClick={() => handleHide(bin.id)}
+                    //     key={bin.header + index}
+                    //     className='tr'
+                    //   >
+                    //     <TableCell>{bin.header}</TableCell>
+                    //     <TableCell>{bin.content}</TableCell>
+                    //     <TableCell>{bin.author}</TableCell>
+                    //     <TableCell>{bin.date}</TableCell>
+                    //   </TableRow>
+                    // ) : (
+                    //   <TableRow
+                    //     key={bin.header + index}
+                    //     onClick={() => handleHide(bin.id)}
+                    //     className='tr'
+                    //   >
+                    //     <TableCell>{bin.header}</TableCell>
+                    //     <TableCell>{bin.content}</TableCell>
+                    //     <TableCell>{bin.author}</TableCell>
+                    //     <TableCell>{bin.date}</TableCell>
+                    //   </TableRow>
+                    // )
+                    <TableRow
+                      key={bin.header + index}
+                      onClick={() => handleHide(bin.id)}
+                      className='tr'
+                    >
+                      <TableCell>{bin.header}</TableCell>
+                      <TableCell>{bin.content}</TableCell>
+                      <TableCell>{bin.author}</TableCell>
+                      <TableCell>{bin.date}</TableCell>
+                    </TableRow>
+                  ))}
             </TableBody>
           </Table>
         </TableContainer>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-export default function useSearch(pageNumber, query, sorting) {
+export default function useSearch(pageNumber, q, sorting, id) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [logs, setLogs] = useState([]);
@@ -9,7 +9,7 @@ export default function useSearch(pageNumber, query, sorting) {
 
   useEffect(() => {
     setLogs([]);
-  }, [query, sorting]);
+  }, [q, sorting]);
 
   useEffect(() => {
     setLoading(true);
@@ -18,7 +18,7 @@ export default function useSearch(pageNumber, query, sorting) {
     axios({
       method: 'GET',
       url: `/api/data/_bins/${pageNumber}`,
-      params: { q: query },
+      params: { q, id },
       cancelToken: new axios.CancelToken((c) => (cancel = c)),
     })
       .then((res) => {
@@ -34,7 +34,7 @@ export default function useSearch(pageNumber, query, sorting) {
         setError(true);
       });
     return () => cancel();
-  }, [query, pageNumber, sorting]);
+  }, [q, pageNumber, sorting]);
   // }, [pageNumber]);
 
   return { loading, error, logs, hasMore };

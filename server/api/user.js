@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
 const { Router } = require('express');
-//mongoDB models:
+//MongoDB models:
 const User = require('../models/user');
 
 const router = Router();
@@ -36,7 +36,6 @@ router.put('/_alerts', async (req, res) => {
     User.update({ _id: ObjectId(id) }, { $set: { alerts } })
       .then(() => res.status(201).json('Updated alerts!'))
       .catch((e) => res.status(404).json(e));
-    // res.json({ message: 'updated' });
   } catch ({ message }) {
     res.status(500).send(message);
   }

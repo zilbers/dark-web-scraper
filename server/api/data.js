@@ -2,6 +2,8 @@ const { Router } = require('express');
 const { Client } = require('@elastic/elasticsearch');
 const Sentiment = require('sentiment');
 const crypto = require('crypto');
+// MongoDB models:
+const User = require('../models/user');
 
 // Helpers
 async function indices(client, index, properties) {
@@ -101,7 +103,11 @@ router.get('/', async (req, res) => {
       }
     );
 
-    const sourceArr = result.hits.hits.map((item) => item._source);
+    const sourceArr = result.hits.hits.map((item) => ({
+      ...item._source,
+      id: item._id,
+    }));
+
     res.json(sourceArr);
   } catch ({ message }) {
     res.status(500).send(message);
@@ -124,8 +130,11 @@ router.get('/_search', async (req, res) => {
         maxRetries: 3,
       }
     );
+    const sourceArr = result.hits.hits.map((item) => ({
+      ...item._source,
+      id: item._id,
+    }));
 
-    const sourceArr = result.hits.hits.map((item) => item._source);
     res.json(sourceArr);
   } catch ({ message }) {
     res.status(500).send(message);
@@ -178,7 +187,8 @@ router.get('/_check', async (req, res) => {
 router.get('/_bins/:page', async (req, res) => {
   try {
     const page = Number(req.params.page);
-    const { q } = req.query;
+    const { q, id: _id } = req.query;
+    // const { alerts: hiding } = await User.findOne({ _id });
     const body = q
       ? {
           index: 'data',
@@ -200,9 +210,13 @@ router.get('/_bins/:page', async (req, res) => {
       maxRetries: 3,
     });
 
-    const sourceArr = result.hits.hits.map((item) => item._source);
+    const sourceArr = result.hits.hits.map((item) => ({
+      ...item._source,
+      id: item._id,
+    }));
+    // .filter(({ id }) => !hiding.includes(id));
 
-    res.send(sourceArr.slice(page * 10, page * 10 + 10));
+    res.send(sourceArr.slice(page * 20, page * 20 + 20));
   } catch (err) {
     res.status(500).send({ error: err });
   }

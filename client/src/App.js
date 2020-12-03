@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import AppBar from './components/AppBar';
 import LineChart from './components/LineChart';
@@ -6,6 +6,7 @@ import PieChart from './components/PieChart';
 import Bins from './components/Bins';
 import useDebouncedSearch from './hooks/useDebouncedSearch';
 import styled from 'styled-components';
+import { UserContext } from './context/UserContext';
 import './App.css';
 
 async function searchInDb(query) {
@@ -24,6 +25,7 @@ const Container = styled.div`
 `;
 
 function App() {
+  const context = useContext(UserContext);
   const [data, setData] = useState();
   const [hiding, setHiding] = useState([]);
   const { inputText, setInputText, searchResults } = useSearchInDb();
@@ -34,7 +36,9 @@ function App() {
   };
 
   const getHiding = async () => {
-    const { data: results } = await axios.get('/api/user/_alerts');
+    const { data: results } = await axios.get(
+      `/api/user/_alerts?id=${context.userId}`
+    );
     setHiding(results.hiding);
   };
 
@@ -56,7 +60,7 @@ function App() {
             getData={getData}
           />
           <Container>
-            <Bins hiding={hiding} setHiding={setHiding} />
+            <Bins hiding={hiding} setHiding={setHiding} data={data} />
             <LineChart
               url='api/data/_sentiment'
               data={data}

@@ -18,6 +18,7 @@ import NewReleasesIcon from '@material-ui/icons/NewReleases';
 import ReplayIcon from '@material-ui/icons/Replay';
 import WorkIcon from '@material-ui/icons/Work';
 import WorkOffIcon from '@material-ui/icons/WorkOff';
+import { UserContext } from '../context/UserContext';
 import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
@@ -92,6 +93,7 @@ export default function PrimarySearchAppBar({
   inputText,
   getData,
 }) {
+  const context = React.useContext(UserContext);
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [scraperStatus, setScraperStatus] = React.useState({
@@ -134,7 +136,7 @@ export default function PrimarySearchAppBar({
   };
 
   const showAll = async () => {
-    axios.post('/api/user/_alerts', []);
+    axios.put(`/api/user/_alerts?id=${context.userId}`, []);
     setHiding([]);
   };
 
@@ -153,7 +155,11 @@ export default function PrimarySearchAppBar({
         Scraper Status:{' '}
         <span
           style={{
-            background: scraperStatus.active ? 'green' : 'red',
+            background: scraperStatus.active
+              ? 'green'
+              : scraperStatus.message === 'On 2 minutes cooldown!'
+              ? 'orange'
+              : 'red',
             padding: '5px',
             fontWeight: 600,
           }}
@@ -286,7 +292,10 @@ export default function PrimarySearchAppBar({
                 <>
                   <div
                     style={{
-                      background: 'red',
+                      background:
+                        scraperStatus.message === 'On 2 minutes cooldown!'
+                          ? 'orange'
+                          : 'red',
                       display: 'flex',
                       padding: '5px',
                     }}
