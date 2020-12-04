@@ -116,7 +116,8 @@ export default function Bins({ hiding, setHiding, data }) {
                   .filter(({ id }) => !hiding.includes(id))
                   .map(
                     (bin, index) =>
-                      logs.length === index + 1 ? (
+                      logs.filter(({ id }) => !hiding.includes(id)).length ===
+                      index + 1 ? (
                         <TableRow
                           ref={lastLogElementRef}
                           onClick={() => handleHide(bin.id)}
