@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from helpers.set_driver import set_driver
 import logging
+from datetime import datetime
 import os
 
 
@@ -70,8 +71,10 @@ def scraper_request(url, keywords=[]):
         print("\tAdding data to object..")
         for index in range(len(content)):
             author_date = author[index * 2].text.split("at")
+            date = author_date[1].replace(
+                "UTC", "").replace(",", "").strip()
             data_dict = {
                 "header": headers[index].text.strip(), "content": content[index].text.strip(
-                ), "author": author_date[0].strip().replace("Posted by ", ""), "date": author_date[1].strip()}
+                ), "author": author_date[0].strip().replace("Posted by ", ""), "date": str(datetime.strptime(date, '%d %b %Y %H:%M:%S'))}
             data.append(data_dict)
     return data

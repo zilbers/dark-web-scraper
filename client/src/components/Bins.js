@@ -87,12 +87,6 @@ export default function Bins({ hiding, setHiding, data }) {
   return (
     <>
       <OptionsContainer>
-        {/* <Select
-          options={sortingOptions}
-          currentChosenOpttion={sort}
-          setOption={setSort}
-          select='Sort'
-        /> */}
         <Input
           value={search}
           setValue={setSearch}
@@ -119,9 +113,6 @@ export default function Bins({ hiding, setHiding, data }) {
             <TableBody>
               {logs &&
                 logs
-                  .sort(function (a, b) {
-                    return new Date(b.date) - new Date(a.date);
-                  })
                   .filter(({ id }) => !hiding.includes(id))
                   .map(
                     (bin, index) =>

@@ -7,7 +7,7 @@ const User = require('../models/user');
 
 // Helpers
 async function indices(client, index, properties) {
-  client.indices.exists(
+  return client.indices.exists(
     {
       index,
     },
@@ -20,8 +20,10 @@ async function indices(client, index, properties) {
             index,
             body: {
               mappings: {
-                properties: {
-                  ...properties,
+                _doc: {
+                  properties: {
+                    ...properties,
+                  },
                 },
               },
             },
@@ -45,15 +47,40 @@ const client = new Client({
 const dataProps = {
   header: {
     type: 'text',
+    fields: {
+      keyword: {
+        type: 'keyword',
+        ignore_above: 256,
+      },
+    },
   },
   content: {
     type: 'text',
+    fields: {
+      keyword: {
+        type: 'keyword',
+        ignore_above: 256,
+      },
+    },
   },
   author: {
     type: 'text',
+    fields: {
+      keyword: {
+        type: 'keyword',
+        ignore_above: 256,
+      },
+    },
   },
   date: {
-    type: 'text',
+    type: 'date',
+    format: 'yyyy-MM-dd HH:mm:ss',
+    fields: {
+      keyword: {
+        type: 'keyword',
+        ignore_above: 256,
+      },
+    },
   },
 };
 
@@ -193,21 +220,21 @@ router.get('/_bins/:page', async (req, res) => {
       ? {
           from: page * 10,
           size: 10,
+          sort: 'date',
           index: 'data',
           q: `*${q}*`,
           // q,
-          size: 1000,
         }
       : {
           from: page * 10,
           size: 10,
+          sort: 'date',
           index: 'data',
           body: {
             query: {
               match_all: {},
             },
           },
-          size: 1000,
         };
     const { body: result } = await client.search(body, {
       ignore: [404],
@@ -294,7 +321,7 @@ router.post('/_status', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const index = 'data';
-    await indices(client, index, dataProps);
+    indices(client, index, dataProps);
 
     const { body: data } = req;
     const body = data.flatMap((doc) => {
@@ -302,8 +329,9 @@ router.post('/', async (req, res) => {
         .createHash('md5')
         .update(doc.date + doc.header)
         .digest('hex');
-      return [{ index: { _index: index, _type: 'data', _id } }, doc];
+      return [{ index: { _index: index, _type: '_doc', _id } }, doc];
     });
+
     const bulkResponse = await client.bulk({ refresh: true, body });
     res.json(bulkResponse);
   } catch ({ message }) {
