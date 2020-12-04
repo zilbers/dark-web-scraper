@@ -62,7 +62,7 @@ def main():
         config = requests.get(url + '/api/user/_config?id=5fc8d9d5f6779c0312d44dca' if url !=
                               None else 'http://localhost:8080/api/user/_config?id=5fc8d9d5f6779c0312d44dca').json()
         try:
-            logging.info("\nSetting up your Proxy to browse the dark web!")
+            print("\nSetting up your Proxy to browse the dark web!")
             requests.post(url + '/api/data/_status' if url !=
                           None else 'http://localhost:8080/api/data/_status', json={'message': 'Scraping!', 'active': True})
             data = scraper_request(config["url"], config["keywords"])
@@ -94,13 +94,13 @@ def main():
             message = f'On {config["cooldown"]} minutes cooldown!'
             res = requests.post(url + '/api/data' if url !=
                                 None else 'http://localhost:8080/api/data', json=data)
-            logging.info(f'Data sent to server and, {res}')
+            print(f'Data sent to server and, {res}')
         except:
             message = 'An error occurd!'
 
         requests.post(url + '/api/data/_status' if url !=
                       None else 'http://localhost:8080/api/data/_status', json={'message': message, 'active': False})
-        logging.info(f"Waiting minutes before next interval")
+        print(f"Waiting minutes before next interval")
         time.sleep(int(config["cooldown"]) * 60)
 
 

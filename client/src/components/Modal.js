@@ -40,6 +40,7 @@ export default function TransitionsModal() {
   const [input, setInput] = React.useState('');
   const [config, setConfig] = React.useState();
   const { register, handleSubmit, errors } = useForm();
+
   const onSubmit = (data) => {
     handleClose();
     axios.put(`http://localhost:8080/api/user/_config?id=${context.userId}`, {
@@ -62,98 +63,91 @@ export default function TransitionsModal() {
     setOpen(false);
   };
 
-  const handleAdd = () => {
+  const handleAdd = (event) => {
+    event.preventDefault();
     setKeywords((currentKeywords) => [...currentKeywords, input]);
     setInput('');
   };
 
   return (
     <>
-      {/* <button type='button' onClick={handleOpen}>
-        react-transition-group
-      </button> */}
-
       <IconButton aria-label='settings' color='inherit' onClick={handleOpen}>
         <SettingsIcon />
       </IconButton>
 
-      {config && (
-        <Modal
-          aria-labelledby='transition-modal-title'
-          aria-describedby='transition-modal-description'
-          className={classes.modal}
-          open={open}
-          onClose={handleClose}
-          closeAfterTransition
-          BackdropComponent={Backdrop}
-          BackdropProps={{
-            timeout: 500,
-          }}
-        >
-          <Fade in={open}>
-            <div className={classes.paper}>
-              <Form onSubmit={handleSubmit(onSubmit)}>
-                <h4>URL:</h4>
+      <Modal
+        aria-labelledby='transition-modal-title'
+        aria-describedby='transition-modal-description'
+        className={classes.modal}
+        open={open}
+        onClose={handleClose}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        <Fade in={open}>
+          <div className={classes.paper}>
+            <Form onSubmit={handleSubmit(onSubmit)}>
+              <h4>URL:</h4>
+              {config && (
                 <InputLabel id='url'>current: {config.url}</InputLabel>
-                <input name='url' ref={register({ required: true })} />
-                {errors.url && <span>This field is required</span>}
+              )}
+              <input name='url' ref={register({ required: true })} />
+              {errors.url && <span>This field is required</span>}
 
-                <h4>Cooldown:</h4>
+              <h4>Cooldown:</h4>
+              {config && (
                 <InputLabel id='url'>current: {config.cooldown}</InputLabel>
-                <input
-                  type='number'
-                  id='cooldown'
-                  name='cooldown'
-                  min='1'
-                  max='20'
-                  ref={register({ required: true })}
-                ></input>
-                {errors.cooldown && <span>This field is required</span>}
+              )}
+              <input
+                type='number'
+                id='cooldown'
+                name='cooldown'
+                min='1'
+                max='20'
+                ref={register({ required: true })}
+              ></input>
+              {errors.cooldown && <span>This field is required</span>}
 
+              <div>
+                <h4>keywords:</h4>{' '}
                 <div>
-                  <h4>keywords:</h4>{' '}
-                  <div>
-                    Add:{' '}
-                    {keywords.map((word, index) =>
-                      !index === 0 ? (
-                        <span key={index}>
-                          {word}
-                          {index === keywords.length - 1 ? '' : ', '}
-                        </span>
-                      ) : (
-                        ''
-                      )
-                    )}
-                  </div>
+                  Add:{' '}
+                  {keywords.map((word, index) => (
+                    <span key={index}>
+                      {word}
+                      {index === keywords.length - 1 ? '' : ', '}
+                    </span>
+                  ))}
+                </div>
+                {config && (
                   <InputLabel id='url'>
                     current:{' '}
-                    {config.keywords.map((word, index) =>
-                      !index === 0 ? (
-                        <span key={index}>
-                          {word}
-                          {index === keywords.length - 1 ? '' : ', '}
-                        </span>
-                      ) : (
-                        ''
-                      )
-                    )}
+                    {config.keywords.map((word, index) => (
+                      <span key={index}>
+                        {word}
+                        {index === config.keywords.length - 1 ? '' : ', '}
+                      </span>
+                    ))}
                   </InputLabel>
-                </div>
-                <div>
-                  <input
-                    name='keywords'
-                    value={input}
-                    onChange={({ target }) => setInput(target.value)}
-                  />
-                  <button onClick={handleAdd}>Add</button>
-                </div>
-                {errors.keywords && <span>This field is required</span>}
-                <input type='submit' />
-              </Form>
-            </div>
-          </Fade>
-        </Modal>
-      )}
+                )}
+              </div>
+              <div>
+                <input
+                  name='keywords'
+                  value={input}
+                  onChange={({ target }) => setInput(target.value)}
+                />
+                <button onClick={handleAdd}>Add</button>
+              </div>
+              {errors.keywords && <span>This field is required</span>}
+              <input type='submit' />
+            </Form>
+          </div>
+        </Fade>
+      </Modal>
     </>
   );
 }

@@ -41,7 +41,7 @@ def scraper_selenium(url, keywords=[]):
 
 # Scrapes the data and returns a JSON with the content, using requests
 def scraper_request(url, keywords=[]):
-    logging.info(f"Scraping {url}")
+    print(f"Scraping {url}")
 
     host = os.environ.get('PROXY')
 
@@ -54,7 +54,7 @@ def scraper_request(url, keywords=[]):
 
     for search in keywords:
         # Scrapping
-        logging.info(f"\nSearching: {search}..")
+        print(f"\nSearching: {search}..")
         r = requests.get(
             f'{url}{search if search == "all" else f"search?q={search}"}', proxies=proxyDict)
 
@@ -64,10 +64,10 @@ def scraper_request(url, keywords=[]):
         author = soup.select('.col-sm-6')
 
         if len(headers) == 0:
-            logging.info(f"\tNo data at: {search}!")
+            print(f"\tNo data at: {search}!")
             continue
 
-        logging.info("\tAdding data to object..")
+        print("\tAdding data to object..")
         for index in range(len(content)):
             author_date = author[index * 2].text.split("at")
             data_dict = {
