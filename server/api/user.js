@@ -41,7 +41,18 @@ router.put('/_alerts', async (req, res) => {
   }
 });
 
-// Posts seen bins
+// Get current config
+router.get('/_config', async (req, res) => {
+  try {
+    const { id: _id } = req.query;
+    const { config } = await User.findOne({ _id });
+    res.json(config);
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
+// Updates config
 router.put('/_config', async (req, res) => {
   try {
     const { body: config } = req;

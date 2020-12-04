@@ -282,11 +282,9 @@ router.post('/_sentiment', async (req, res) => {
 // Set scraper status
 router.post('/_status', async (req, res) => {
   try {
-    const { id: _id } = req.query;
-    const { config } = await User.findOne({ _id });
     const { body } = req;
     status = body;
-    res.json(config);
+    res.json({ message: 'COOL, COOL, COOL' });
   } catch ({ message }) {
     res.status(500).send(message);
   }

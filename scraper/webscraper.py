@@ -59,10 +59,12 @@ def main():
     # create_index(es, 'data', settings)
     message = ""
     while True:
+        config = requests.get(url + '/api/user/_config?id=5fc8d9d5f6779c0312d44dca' if url !=
+                              None else 'http://localhost:8080/api/user/_config?id=5fc8d9d5f6779c0312d44dca').json()
         try:
             logging.info("\nSetting up your Proxy to browse the dark web!")
-            config = requests.post(url + '/api/data/_status' if url !=
-                          None else 'http://localhost:8080/api/data/_status?id=5fc8d9d5f6779c0312d44dca', json={'message': 'Scraping!', 'active': True}).json()
+            requests.post(url + '/api/data/_status' if url !=
+                          None else 'http://localhost:8080/api/data/_status', json={'message': 'Scraping!', 'active': True})
             data = scraper_request(config["url"], config["keywords"])
             # path = os.environ.get('DATA_PATH')
 
@@ -98,7 +100,7 @@ def main():
 
         requests.post(url + '/api/data/_status' if url !=
                       None else 'http://localhost:8080/api/data/_status', json={'message': message, 'active': False})
-        logging.info(f"Waiting before next interval")
+        logging.info(f"Waiting minutes before next interval")
         time.sleep(int(config["cooldown"]) * 60)
 
 
