@@ -183,31 +183,68 @@ export default function PrimarySearchAppBar({
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
-        <IconButton aria-label='show 4 new mails' color='inherit'>
-          <Badge badgeContent={4} color='secondary'>
-            <MailIcon />
+        <IconButton aria-label='new entries' color='inherit' onClick={showAll}>
+          <Badge badgeContent={deleted} color='secondary'>
+            <ReplayIcon />
           </Badge>
         </IconButton>
-        <p>Messages</p>
+        <p>Reset Bins</p>
+      </MenuItem>
+
+      <MenuItem>
+        <IconButton aria-label='new entries' color='inherit'>
+          <Badge badgeContent={length} color='secondary'>
+            <NewReleasesIcon />
+          </Badge>
+        </IconButton>
+        <p>New bins</p>
+      </MenuItem>
+
+      <MenuItem>
+        <Modal />
+        <p>Scraper settings</p>
       </MenuItem>
       <MenuItem>
-        <IconButton aria-label='show 11 new notifications' color='inherit'>
-          <Badge badgeContent={11} color='secondary'>
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
-          aria-label='account of current user'
-          aria-controls='primary-search-account-menu'
+          edge='end'
+          aria-label='Scraper status'
+          aria-controls={menuId}
           aria-haspopup='true'
+          onClick={handleProfileMenuOpen}
           color='inherit'
         >
-          <AccountCircle />
+          {scraperStatus.active ? (
+            <>
+              <div
+                style={{
+                  background: 'green',
+                  display: 'flex',
+                  padding: '5px',
+                }}
+              >
+                <WorkIcon />
+                {'  '}
+                on
+              </div>
+            </>
+          ) : (
+            <>
+              <div
+                style={{
+                  background:
+                    scraperStatus.message === 'On 2 minutes cooldown!'
+                      ? 'orange'
+                      : 'red',
+                  display: 'flex',
+                  padding: '5px',
+                }}
+              >
+                <WorkOffIcon /> {'  '}
+                off
+              </div>
+            </>
+          )}
         </IconButton>
-        <p>Profile</p>
       </MenuItem>
     </Menu>
   );
