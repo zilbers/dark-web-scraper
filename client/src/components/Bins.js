@@ -117,27 +117,39 @@ export default function Bins({ hiding, setHiding, data }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data &&
-                data
+              {logs &&
+                logs
                   .sort(function (a, b) {
                     return new Date(b.date) - new Date(a.date);
                   })
                   .filter(({ id }) => !hiding.includes(id))
-                  .map((bin, index) => (
-                    // logs.length === index + 1 ? (
-                    //   <TableRow
-                    //     ref={lastLogElementRef}
-                    //     onClick={() => handleHide(bin.id)}
-                    //     key={bin.header + index}
-                    //     className='tr'
-                    //   >
-                    //     <TableCell>{bin.header}</TableCell>
-                    //     <TableCell>{bin.content}</TableCell>
-                    //     <TableCell>{bin.author}</TableCell>
-                    //     <TableCell>{bin.date}</TableCell>
-                    //   </TableRow>
-                    // ) : (
-                    //   <TableRow
+                  .map(
+                    (bin, index) =>
+                      logs.length === index + 1 ? (
+                        <TableRow
+                          ref={lastLogElementRef}
+                          onClick={() => handleHide(bin.id)}
+                          key={bin.header + index}
+                          className='tr'
+                        >
+                          <TableCell>{bin.header}</TableCell>
+                          <TableCell>{bin.content}</TableCell>
+                          <TableCell>{bin.author}</TableCell>
+                          <TableCell>{bin.date}</TableCell>
+                        </TableRow>
+                      ) : (
+                        <TableRow
+                          key={bin.header + index}
+                          onClick={() => handleHide(bin.id)}
+                          className='tr'
+                        >
+                          <TableCell>{bin.header}</TableCell>
+                          <TableCell>{bin.content}</TableCell>
+                          <TableCell>{bin.author}</TableCell>
+                          <TableCell>{bin.date}</TableCell>
+                        </TableRow>
+                      )
+                    //   (<TableRow
                     //     key={bin.header + index}
                     //     onClick={() => handleHide(bin.id)}
                     //     className='tr'
@@ -148,17 +160,7 @@ export default function Bins({ hiding, setHiding, data }) {
                     //     <TableCell>{bin.date}</TableCell>
                     //   </TableRow>
                     // )
-                    <TableRow
-                      key={bin.header + index}
-                      onClick={() => handleHide(bin.id)}
-                      className='tr'
-                    >
-                      <TableCell>{bin.header}</TableCell>
-                      <TableCell>{bin.content}</TableCell>
-                      <TableCell>{bin.author}</TableCell>
-                      <TableCell>{bin.date}</TableCell>
-                    </TableRow>
-                  ))}
+                  )}
             </TableBody>
           </Table>
         </TableContainer>

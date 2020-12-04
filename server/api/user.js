@@ -41,6 +41,20 @@ router.put('/_alerts', async (req, res) => {
   }
 });
 
+// Posts seen bins
+router.put('/_config', async (req, res) => {
+  try {
+    const { body: config } = req;
+    const { id } = req.query;
+
+    User.update({ _id: ObjectId(id) }, { $set: { config } })
+      .then(() => res.status(201).json('Updated config!'))
+      .catch((e) => res.status(404).json(e));
+  } catch ({ message }) {
+    res.status(500).send(message);
+  }
+});
+
 // Register new user
 router.post('/_new', (req, res) => {
   try {

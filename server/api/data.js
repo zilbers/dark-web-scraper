@@ -191,12 +191,16 @@ router.get('/_bins/:page', async (req, res) => {
     // const { alerts: hiding } = await User.findOne({ _id });
     const body = q
       ? {
+          from: page * 10,
+          size: 10,
           index: 'data',
           q: `*${q}*`,
           // q,
           size: 1000,
         }
       : {
+          from: page * 10,
+          size: 10,
           index: 'data',
           body: {
             query: {
@@ -216,7 +220,7 @@ router.get('/_bins/:page', async (req, res) => {
     }));
     // .filter(({ id }) => !hiding.includes(id));
 
-    res.send(sourceArr.slice(page * 20, page * 20 + 20));
+    res.send(sourceArr);
   } catch (err) {
     res.status(500).send({ error: err });
   }
@@ -278,9 +282,11 @@ router.post('/_sentiment', async (req, res) => {
 // Set scraper status
 router.post('/_status', async (req, res) => {
   try {
+    const { id: _id } = req.query;
+    const { config } = await User.findOne({ _id });
     const { body } = req;
     status = body;
-    res.json({ message: 'COOL, COOL, COOL' });
+    res.json(config);
   } catch ({ message }) {
     res.status(500).send(message);
   }

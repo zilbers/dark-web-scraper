@@ -13,6 +13,7 @@
     "react": "^17.0.1",
     "react-async-hook": "^3.6.2",
     "react-dom": "^17.0.1",
+    "react-hook-form": "^6.12.2",
     "react-scripts": "4.0.1",
     "recharts": "^1.8.5",
     "styled-components": "^5.2.1",

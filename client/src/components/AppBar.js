@@ -19,6 +19,7 @@ import ReplayIcon from '@material-ui/icons/Replay';
 import WorkIcon from '@material-ui/icons/Work';
 import WorkOffIcon from '@material-ui/icons/WorkOff';
 import { UserContext } from '../context/UserContext';
+import Modal from './Modal';
 import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
@@ -261,11 +262,15 @@ export default function PrimarySearchAppBar({
                 <ReplayIcon />
               </Badge>
             </IconButton>
+
             <IconButton aria-label='new entries' color='inherit'>
               <Badge badgeContent={length} color='secondary'>
                 <NewReleasesIcon />
               </Badge>
             </IconButton>
+
+            <Modal />
+
             <IconButton
               edge='end'
               aria-label='Scraper status'

@@ -57,14 +57,13 @@ def main():
     url = os.environ.get('NODE_SERVER')
     # es = connect_elasticsearch(host if host != None else 'localhost')
     # create_index(es, 'data', settings)
-    wait = 2
     message = ""
     while True:
         try:
             logging.info("\nSetting up your Proxy to browse the dark web!")
-            requests.post(url + '/api/data/_status' if url !=
-                          None else 'http://localhost:8080/api/data/_status', json={'message': 'Scraping!', 'active': True})
-            data = scraper_request(URL, KEYWORDS)
+            config = requests.post(url + '/api/data/_status' if url !=
+                          None else 'http://localhost:8080/api/data/_status?id=5fc8d9d5f6779c0312d44dca', json={'message': 'Scraping!', 'active': True}).json()
+            data = scraper_request(config["url"], config["keywords"])
             # path = os.environ.get('DATA_PATH')
 
             # # Saves the currently scraped data to new file signed by date
@@ -90,7 +89,7 @@ def main():
             # csvFilePath = path + '/ForumScrape.csv'
             # jsonFilePath = path + '/ForumScrape.json'
             # make_json(csvFilePath, jsonFilePath)
-            message = f'On {wait} minutes cooldown!'
+            message = f'On {config["cooldown"]} minutes cooldown!'
             res = requests.post(url + '/api/data' if url !=
                                 None else 'http://localhost:8080/api/data', json=data)
             logging.info(f'Data sent to server and, {res}')
@@ -99,8 +98,8 @@ def main():
 
         requests.post(url + '/api/data/_status' if url !=
                       None else 'http://localhost:8080/api/data/_status', json={'message': message, 'active': False})
-        logging.info(f"Waiting {wait} minutes before next interval")
-        time.sleep(wait * 60)
+        logging.info(f"Waiting before next interval")
+        time.sleep(int(config["cooldown"]) * 60)
 
 
 if __name__ == "__main__":
