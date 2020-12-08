@@ -324,7 +324,6 @@ router.post('/', async (req, res) => {
     indices(client, index, dataProps);
 
     const { body: data } = req;
-    console.log(data);
     const body = data.flatMap((doc) => {
       const _id = crypto
         .createHash('md5')
