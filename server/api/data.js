@@ -7,7 +7,7 @@ const User = require('../models/user');
 
 // Helpers
 async function indices(client, index, properties) {
-  return client.indices.exists(
+  await client.indices.exists(
     {
       index,
     },
@@ -324,6 +324,7 @@ router.post('/', async (req, res) => {
     indices(client, index, dataProps);
 
     const { body: data } = req;
+    console.log(data);
     const body = data.flatMap((doc) => {
       const _id = crypto
         .createHash('md5')

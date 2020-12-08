@@ -85,6 +85,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
+const regex = /On [0-9]?[0-9] minutes cooldown!/g;
 
 export default function PrimarySearchAppBar({
   length,
@@ -158,7 +159,7 @@ export default function PrimarySearchAppBar({
           style={{
             background: scraperStatus.active
               ? 'green'
-              : scraperStatus.message === 'On 2 minutes cooldown!'
+              : scraperStatus.message.match(regex)
               ? 'orange'
               : 'red',
             padding: '5px',
@@ -231,10 +232,9 @@ export default function PrimarySearchAppBar({
             <>
               <div
                 style={{
-                  background:
-                    scraperStatus.message === 'On 2 minutes cooldown!'
-                      ? 'orange'
-                      : 'red',
+                  background: scraperStatus.message.match(regex)
+                    ? 'orange'
+                    : 'red',
                   display: 'flex',
                   padding: '5px',
                 }}
@@ -334,10 +334,9 @@ export default function PrimarySearchAppBar({
                 <>
                   <div
                     style={{
-                      background:
-                        scraperStatus.message === 'On 2 minutes cooldown!'
-                          ? 'orange'
-                          : 'red',
+                      background: scraperStatus.message.match(regex)
+                        ? 'orange'
+                        : 'red',
                       display: 'flex',
                       padding: '5px',
                     }}

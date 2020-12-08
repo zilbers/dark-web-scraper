@@ -99,16 +99,21 @@ export default function TransitionsModal() {
 
               <h4>Cooldown:</h4>
               {config && (
-                <InputLabel id='url'>current: {config.cooldown}</InputLabel>
+                <InputLabel id='url'>
+                  current: {config.cooldown} minutes
+                </InputLabel>
               )}
-              <input
-                type='number'
-                id='cooldown'
-                name='cooldown'
-                min='1'
-                max='20'
-                ref={register({ required: true })}
-              ></input>
+              {config && (
+                <input
+                  type='number'
+                  id='cooldown'
+                  name='cooldown'
+                  defaultValue={config.cooldown}
+                  min='1'
+                  max='20'
+                  ref={register({ required: true })}
+                ></input>
+              )}
               {errors.cooldown && <span>This field is required</span>}
 
               <div>
