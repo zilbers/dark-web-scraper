@@ -27,7 +27,7 @@ router.get('/_all', async (req, res) => {
   }
 });
 
-// Posts seen bins
+// Updates seen bins
 router.put('/_alerts', async (req, res) => {
   try {
     const { body: alerts } = req;
