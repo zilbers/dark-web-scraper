@@ -10,7 +10,7 @@ Used Material-UI components to design the page and recharts for the charts.
 
 ## Database
 
-- The app is using MongoDB database wwith Atlas Cloud.
+- The app is using MongoDB database placed in Atlas Cloud.
 - The app is using Elasticsearch database.
 - Elastic used for text querying and analytics.
 - MongoDB used for Users data.
@@ -58,10 +58,11 @@ Used Material-UI components to design the page and recharts for the charts.
 
 ## Scraper
 
-- The scraper is written in python.
-- There are 2 option, scraper using Selenium or scrape using BS4.
+- The scraper is written in Python.
+- There are 2 option, scrape using Selenium or scrape using BS4.
 - If ran in docker, it only supports BS4.
 - The scraper get his config from the Node.JS server, where it gets keywords to search, cooldown and url.
+- After it finishes scrapping, it updates the server and sends all newly scrapped data.
 
 ## Docker
 
