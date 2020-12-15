@@ -66,7 +66,7 @@ services:
       - '8000:8000'
     volumes:
       - ./scraper:/app
-    command: sh -c '/app/wait_for_it.sh elasticsearch:9200 && /app/wait_for_it.sh tor:9050 && /app/wait_for_it.sh node-server:8080 && python /app/webscraper.py'
+    command: sh -c '/app/wait_for_it.sh elasticsearch:9200 && /app/wait_for_it.sh tor:9050 && /app/wait_for_it.sh node-server:8080 && python -u /app/webscraper.py'
 
     networks:
       app-network:

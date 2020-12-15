@@ -53,6 +53,7 @@ export default function Bins({ hiding, setHiding, data }) {
   const [pageNumber, setPageNumber] = useState(0);
   const [search, setSearch] = useState(() => '');
   const [sort, setSort] = useState(() => '');
+  const [showAll, setShowAll] = useState(false);
 
   const { logs, hasMore, loading, error } = useLogsSearch(
     pageNumber,
@@ -87,18 +88,21 @@ export default function Bins({ hiding, setHiding, data }) {
   return (
     <>
       <OptionsContainer>
-        {/* <Select
-          options={sortingOptions}
-          currentChosenOpttion={sort}
-          setOption={setSort}
-          select='Sort'
-        /> */}
         <Input
           value={search}
           setValue={setSearch}
           label='Search'
           setPage={setPageNumber}
         />
+        <h5>
+          Show All:
+          <input
+            type='checkbox'
+            name='showAll'
+            value={showAll}
+            onChange={() => setShowAll(!showAll)}
+          />
+        </h5>
       </OptionsContainer>
 
       <Paper className={classes.root}>
@@ -117,40 +121,44 @@ export default function Bins({ hiding, setHiding, data }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data &&
-                data
-                  .sort(function (a, b) {
-                    return new Date(b.date) - new Date(a.date);
-                  })
+              {logs &&
+                !showAll &&
+                logs
                   .filter(({ id }) => !hiding.includes(id))
-                  .map((bin, index) => (
-                    // logs.length === index + 1 ? (
-                    //   <TableRow
-                    //     ref={lastLogElementRef}
-                    //     onClick={() => handleHide(bin.id)}
-                    //     key={bin.header + index}
-                    //     className='tr'
-                    //   >
-                    //     <TableCell>{bin.header}</TableCell>
-                    //     <TableCell>{bin.content}</TableCell>
-                    //     <TableCell>{bin.author}</TableCell>
-                    //     <TableCell>{bin.date}</TableCell>
-                    //   </TableRow>
-                    // ) : (
-                    //   <TableRow
-                    //     key={bin.header + index}
-                    //     onClick={() => handleHide(bin.id)}
-                    //     className='tr'
-                    //   >
-                    //     <TableCell>{bin.header}</TableCell>
-                    //     <TableCell>{bin.content}</TableCell>
-                    //     <TableCell>{bin.author}</TableCell>
-                    //     <TableCell>{bin.date}</TableCell>
-                    //   </TableRow>
-                    // )
+                  .map((bin, index) =>
+                    logs.filter(({ id }) => !hiding.includes(id)).length ===
+                    index + 1 ? (
+                      <TableRow
+                        ref={lastLogElementRef}
+                        onClick={() => handleHide(bin.id)}
+                        key={bin.header + index}
+                        className='tr'
+                      >
+                        <TableCell>{bin.header}</TableCell>
+                        <TableCell>{bin.content}</TableCell>
+                        <TableCell>{bin.author}</TableCell>
+                        <TableCell>{bin.date}</TableCell>
+                      </TableRow>
+                    ) : (
+                      <TableRow
+                        key={bin.header + index}
+                        onClick={() => handleHide(bin.id)}
+                        className='tr'
+                      >
+                        <TableCell>{bin.header}</TableCell>
+                        <TableCell>{bin.content}</TableCell>
+                        <TableCell>{bin.author}</TableCell>
+                        <TableCell>{bin.date}</TableCell>
+                      </TableRow>
+                    )
+                  )}
+              {logs &&
+                showAll &&
+                logs.map((bin, index) =>
+                  logs.length === index + 1 ? (
                     <TableRow
+                      ref={lastLogElementRef}
                       key={bin.header + index}
-                      onClick={() => handleHide(bin.id)}
                       className='tr'
                     >
                       <TableCell>{bin.header}</TableCell>
@@ -158,7 +166,15 @@ export default function Bins({ hiding, setHiding, data }) {
                       <TableCell>{bin.author}</TableCell>
                       <TableCell>{bin.date}</TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    <TableRow key={bin.header + index} className='tr'>
+                      <TableCell>{bin.header}</TableCell>
+                      <TableCell>{bin.content}</TableCell>
+                      <TableCell>{bin.author}</TableCell>
+                      <TableCell>{bin.date}</TableCell>
+                    </TableRow>
+                  )
+                )}
             </TableBody>
           </Table>
         </TableContainer>

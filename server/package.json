@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@elastic/elasticsearch": "^7.10.0",
+    "cors": "^2.8.5",
     "csv-parser": "^2.3.3",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",

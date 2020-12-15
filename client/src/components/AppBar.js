@@ -19,6 +19,7 @@ import ReplayIcon from '@material-ui/icons/Replay';
 import WorkIcon from '@material-ui/icons/Work';
 import WorkOffIcon from '@material-ui/icons/WorkOff';
 import { UserContext } from '../context/UserContext';
+import Modal from './Modal';
 import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
@@ -84,6 +85,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
+const regex = /On [0-9]?[0-9] minutes cooldown!/g;
 
 export default function PrimarySearchAppBar({
   length,
@@ -157,7 +159,7 @@ export default function PrimarySearchAppBar({
           style={{
             background: scraperStatus.active
               ? 'green'
-              : scraperStatus.message === 'On 2 minutes cooldown!'
+              : scraperStatus.message.match(regex)
               ? 'orange'
               : 'red',
             padding: '5px',
@@ -182,31 +184,67 @@ export default function PrimarySearchAppBar({
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
-        <IconButton aria-label='show 4 new mails' color='inherit'>
-          <Badge badgeContent={4} color='secondary'>
-            <MailIcon />
+        <IconButton aria-label='new entries' color='inherit' onClick={showAll}>
+          <Badge badgeContent={deleted} color='secondary'>
+            <ReplayIcon />
           </Badge>
         </IconButton>
-        <p>Messages</p>
+        <p>Reset Bins</p>
+      </MenuItem>
+
+      <MenuItem>
+        <IconButton aria-label='new entries' color='inherit'>
+          <Badge badgeContent={length} color='secondary'>
+            <NewReleasesIcon />
+          </Badge>
+        </IconButton>
+        <p>New bins</p>
+      </MenuItem>
+
+      <MenuItem>
+        <Modal />
+        <p>Scraper settings</p>
       </MenuItem>
       <MenuItem>
-        <IconButton aria-label='show 11 new notifications' color='inherit'>
-          <Badge badgeContent={11} color='secondary'>
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
-          aria-label='account of current user'
-          aria-controls='primary-search-account-menu'
+          edge='end'
+          aria-label='Scraper status'
+          aria-controls={menuId}
           aria-haspopup='true'
+          onClick={handleProfileMenuOpen}
           color='inherit'
         >
-          <AccountCircle />
+          {scraperStatus.active ? (
+            <>
+              <div
+                style={{
+                  background: 'green',
+                  display: 'flex',
+                  padding: '5px',
+                }}
+              >
+                <WorkIcon />
+                {'  '}
+                on
+              </div>
+            </>
+          ) : (
+            <>
+              <div
+                style={{
+                  background: scraperStatus.message.match(regex)
+                    ? 'orange'
+                    : 'red',
+                  display: 'flex',
+                  padding: '5px',
+                }}
+              >
+                <WorkOffIcon /> {'  '}
+                off
+              </div>
+            </>
+          )}
         </IconButton>
-        <p>Profile</p>
       </MenuItem>
     </Menu>
   );
@@ -261,11 +299,15 @@ export default function PrimarySearchAppBar({
                 <ReplayIcon />
               </Badge>
             </IconButton>
+
             <IconButton aria-label='new entries' color='inherit'>
               <Badge badgeContent={length} color='secondary'>
                 <NewReleasesIcon />
               </Badge>
             </IconButton>
+
+            <Modal />
+
             <IconButton
               edge='end'
               aria-label='Scraper status'
@@ -292,10 +334,9 @@ export default function PrimarySearchAppBar({
                 <>
                   <div
                     style={{
-                      background:
-                        scraperStatus.message === 'On 2 minutes cooldown!'
-                          ? 'orange'
-                          : 'red',
+                      background: scraperStatus.message.match(regex)
+                        ? 'orange'
+                        : 'red',
                       display: 'flex',
                       padding: '5px',
                     }}

@@ -53,54 +53,30 @@ def current_milli_time(): return str(round(time.time() * 1000))
 
 
 def main():
-    # host = os.environ.get('HOST')
     url = os.environ.get('NODE_SERVER')
-    # es = connect_elasticsearch(host if host != None else 'localhost')
-    # create_index(es, 'data', settings)
-    wait = 2
+
     message = ""
     while True:
+        config = requests.get(url + '/api/user/_config?id=5fc8d9d5f6779c0312d44dca' if url !=
+                              None else 'http://localhost:8080/api/user/_config?id=5fc8d9d5f6779c0312d44dca').json()
         try:
-            logging.info("\nSetting up your Proxy to browse the dark web!")
+            print("\nSetting up your Proxy to browse the dark web!")
             requests.post(url + '/api/data/_status' if url !=
                           None else 'http://localhost:8080/api/data/_status', json={'message': 'Scraping!', 'active': True})
-            data = scraper_request(URL, KEYWORDS)
-            # path = os.environ.get('DATA_PATH')
 
-            # # Saves the currently scraped data to new file signed by date
-            # date = current_milli_time()
-            # print(f"\nCreating new csv file: scrape-{date}")
-            # df = pd.DataFrame(
-            #     data, columns=['headers', 'content', 'author', 'date', ...])
+            data = scraper_request(config)
 
-            # path = {path if path != None else 'data'}
-            # df.to_csv(path + '/seperated/scrape-{date}.csv')
-
-            # # Creates main file with no duplicates
-            # forum_scrape(path + '/seperated/*.csv', path + '/ForumScrape.csv',
-            #              ["content", "headers", "date"])
-
-            # # Save urls in seperate file
-            # urls = get_urls(f"{path}/ForumScrape.csv")
-            # df = pd.DataFrame(
-            #     urls, columns=['url', ...])
-            # df.to_csv(path + '/Links.csv')
-
-            # print("Making a new JSON file")
-            # csvFilePath = path + '/ForumScrape.csv'
-            # jsonFilePath = path + '/ForumScrape.json'
-            # make_json(csvFilePath, jsonFilePath)
-            message = f'On {wait} minutes cooldown!'
+            message = f'On {config["cooldown"]} minutes cooldown!'
             res = requests.post(url + '/api/data' if url !=
                                 None else 'http://localhost:8080/api/data', json=data)
-            logging.info(f'Data sent to server and, {res}')
+            print(f'Data sent to server and, {res}')
         except:
             message = 'An error occurd!'
 
         requests.post(url + '/api/data/_status' if url !=
                       None else 'http://localhost:8080/api/data/_status', json={'message': message, 'active': False})
-        logging.info(f"Waiting {wait} minutes before next interval")
-        time.sleep(wait * 60)
+        print(f"Waiting minutes before next interval")
+        time.sleep(int(config["cooldown"]) * 60)
 
 
 if __name__ == "__main__":
