@@ -1,6 +1,6 @@
 # ![Scale-Up Velocity](./readme-files/logo-main.png) Omri Zilberstein - Dark Web Scraper
 
-In this project I created a Dark Web Scraper and dashboard, using React.js, Express, Python, MongoDB database and Elasticsearch database. \
+In this project I created a Dark Web Scraper and dashboard, using React.js, Express, Python 3.8, MongoDB database and Elasticsearch database. \
 The scraped data is indexed in Elasticsearch for quick text querying and users data is saved in MongoDB. \
 The app is dockerized and can be run with the docker-compose up. \
 The app has a Dashboard, which presents that data collected, analtyics and configuration options for the scraper. \
@@ -72,5 +72,5 @@ Used Material-UI components to design the page and recharts for the charts.
   docker-compose up
 ```
 
-- THe app has Elasticsearch service, Server service - Node.JS, Scraper - Python service and a Proxy service.
+- The app has Elasticsearch service, Server service - Node.JS, Scraper - Python service and a Proxy service.
 - Docker will build a network and connect all the services, it offers hot-reload so the code can be edited live.
