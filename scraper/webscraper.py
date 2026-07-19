@@ -71,7 +71,7 @@ def main():
                                 None else 'http://localhost:8080/api/data', json=data)
             print(f'Data sent to server and, {res}')
         except:
-            message = 'An error occurd!'
+            message = 'An error occurred!'
 
         requests.post(url + '/api/data/_status' if url !=
                       None else 'http://localhost:8080/api/data/_status', json={'message': message, 'active': False})
